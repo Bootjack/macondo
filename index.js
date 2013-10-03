@@ -48,20 +48,18 @@ module.exports = function (config) {
     
     return function (req, res, next) {
         var id, match;
-        console.log('request for: ' + req.path);
         match = req.path.match(/^\/admin\/([^/]+)\/([^/]+)/);
-        console.log('request match: ' + JSON.stringify(match));
         id = match && match[2];
         if (match && match[1] === name.toLowerCase()) {
-            if ('get' === req.method && id) {
+            if ('GET' === req.method && id) {
                 retrieve(id, res);
-            } else if ('put' === req.method) {
+            } else if ('PUT' === req.method) {
                 if (id) {
                     update(id, res);
                 } else {
                     create(req.body.model, res);
                 }
-            } else if ('delete' === req.method && id) {
+            } else if ('DELETE' === req.method && id) {
                 destroy(id, res);
             }
         }
