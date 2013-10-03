@@ -48,8 +48,9 @@ module.exports = function (config) {
     
     return function (req, res, next) {
         var id, match;
-        console.log('request for ' + req.path);
+        console.log('request for: ' + req.path);
         match = req.path.match(/^\/admin\/([^/]+)\/([^/]+)/);
+        console.log('request match: ' + JSON.stringify(match));
         id = match && match[1];
         if (match && match[0] === name.toLowerCase()) {
             if ('get' === req.route.method && id) {
