@@ -66,7 +66,8 @@ module.exports = function (config) {
             } else if ('DELETE' === req.method && id) {
                 destroy(id, res);
             }
+        } else {
+            next();
         }
-        next();
     };
 };
