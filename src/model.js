@@ -19,15 +19,19 @@ module.exports = function (name, schema) {
     Model.prototype._name = name;
     Model.prototype._fields = [];
     
-    Model.prototype.save = function () {};
+    Model.prototype.save = function () {
+        return this;
+    };
     
-    Model.prototype.destroy = function () {};
+    Model.prototype.destroy = function () {
+        return true;
+    };
     
     /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
     for (property in schema) {
         if (schema.hasOwnProperty(property)) {
             order = schema[property].order;
-            type = (schema[property].type && Model.prototype.DataType[schema[property].type]) || Model.prototype.DataType.Text;
+            type = Model.prototype.DataType[schema[property].type] || Model.prototype.DataType.Text;
             if ('undefined' !== typeof order && order < this._fields.length) {
                 Model.prototype._fields.splice(order, 0, {name: property, type: type});
             } else {

@@ -16,14 +16,16 @@ module.exports = function (config) {
     function create(model, res) {
         console.log('creating model');
         var instance = new Model(req.body.model);
-        instance.save();
-        res.send(200, JSON.stringify(instance));
+        instance.save(function (err, obj) {
+            res.send(200, JSON.stringify(obj));    
+        });
     }
     
     function retrieve(id, res) {
         console.log('retrieving model');
-        var instance = Model.findById(id);
-        res.send(200, JSON.stringify(instance));
+        var instance = Model.findById(id, function(err, obj) {
+            res.send(200, JSON.stringify(obj));        
+        });
     }
 
     function update(id, res) {
@@ -35,15 +37,17 @@ module.exports = function (config) {
                 instance[property] = req.body.model[property];
             }
         }
-        instance.save();
-        res.send(200, JSON.stringify(instance));
+        instance.save(function(err, obj) {
+            res.send(200, JSON.stringify(obj));            
+        });
     }
     
     function destroy(id, res) {
         console.log('destroying model');        
-        var instance = Model.findById(id);
-        instance.destroy();
-        res.send(200, JSON.stringify(instance));
+        Model.findById(id, function (err, obj) {
+            obj.destroy();
+            res.send(200, name + ' ' + id + ' destroyed');            
+        });
     }    
     
     return function (req, res, next) {
