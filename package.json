@@ -1,6 +1,6 @@
 {
   "name": "macondo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Database-agnostic CMS with Express",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,7 @@
   },
   "author": "Jason Hinebaugh",
   "license": "BSD-2-Clause",
+  "repository": "Bootjack/macondo",
   "dependencies": {
     "express": "~3.4.0"
   },

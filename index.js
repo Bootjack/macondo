@@ -50,7 +50,7 @@ module.exports = function (config) {
             if ('get' === req.route.method && id) {
                 retrieve(id, res);
             } else if ('put' === req.route.method) {
-                if (id]) {
+                if (id) {
                     update(id, res);
                 } else {
                     create(req.body.model, res);
