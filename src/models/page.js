@@ -1,3 +1,5 @@
+var Model = require('../model');
+
 module.exports = function () {
     var fields, page;
     page = {};
