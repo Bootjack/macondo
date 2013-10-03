@@ -14,17 +14,20 @@ module.exports = function (config) {
     Model = new ModelFactory(schema);
     
     function create(model, res) {
+        console.log('creating model');
         var instance = new Model(req.body.model);
         instance.save();
         res.send(200, JSON.stringify(instance));
     }
     
     function retrieve(id, res) {
+        console.log('retrieving model');
         var instance = Model.findById(id);
         res.send(200, JSON.stringify(instance));
     }
 
     function update(id, res) {
+        console.log('updating model');
         var instance, property;
         instance = Model.findById(id);
         for (property in req.body.model) {
@@ -37,6 +40,7 @@ module.exports = function (config) {
     }
     
     function destroy(id, res) {
+        console.log('destroying model');        
         var instance = Model.findById(id);
         instance.destroy();
         res.send(200, JSON.stringify(instance));
@@ -46,7 +50,7 @@ module.exports = function (config) {
         var id, match;
         match = req.path.match(/^\/admin\/([^/]+)\/([^/]+)/);
         id = match && match[1];
-        if (match && match[0] === name) {
+        if (match && match[0] === name.toLowerCase())) {
             if ('get' === req.route.method && id) {
                 retrieve(id, res);
             } else if ('put' === req.route.method) {
