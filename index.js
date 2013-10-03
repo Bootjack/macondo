@@ -53,15 +53,15 @@ module.exports = function (config) {
         console.log('request match: ' + JSON.stringify(match));
         id = match && match[2];
         if (match && match[1] === name.toLowerCase()) {
-            if ('get' === req.route.method && id) {
+            if ('get' === req.method && id) {
                 retrieve(id, res);
-            } else if ('put' === req.route.method) {
+            } else if ('put' === req.method) {
                 if (id) {
                     update(id, res);
                 } else {
                     create(req.body.model, res);
                 }
-            } else if ('delete' === req.route.method && id) {
+            } else if ('delete' === req.method && id) {
                 destroy(id, res);
             }
         }
