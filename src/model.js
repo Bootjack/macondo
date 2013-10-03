@@ -1,11 +1,11 @@
-module.exports = function (schema) {
+module.exports = function (name, schema) {
     var order, property, type;
 
     function Model(data) {
         var i, field;
-        for (i = 0; i < this.fields.length; i += 1) {
-            field = this.fields[i];
-            this[field] = data[field] || this.fields.default;
+        for (i = 0; i < this._fields.length; i += 1) {
+            field = this._fields[i];
+            this[field.name] = data[field.name] || field.default;
         }
     }
 
@@ -16,19 +16,31 @@ module.exports = function (schema) {
         'Date': {name: 'date', default: new Date().toUTCString()}
     };
     
-    Model.prototype.fields = [];
+    Model.prototype._name = name;
+    Model.prototype._fields = [];
+    
+    Model.prototype.save = function () {};
+    
+    Model.prototype.destroy = function () {};
+    
     /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
     for (property in schema) {
         if (schema.hasOwnProperty(property)) {
             order = schema[property].order;
-            type = (schema[property].type && this.DataType[schema[property].type]) || Model.prototype.DataType.Text;
+            type = (schema[property].type && Model.prototype.DataType[schema[property].type]) || Model.prototype.DataType.Text;
             if ('undefined' !== typeof order && order < this._fields.length) {
-                Model.prototype.fields.splice(order, 0, {name: property, type: type});
+                Model.prototype._fields.splice(order, 0, {name: property, type: type});
             } else {
-                Model.prototype.fields.push({name: property, type: type});
+                Model.prototype._fields.push({name: property, type: type});
             }
         }
     }
     
+    Model.findById = function (id, callback) {
+        var err, instance;
+        err = new Error('Not implemented');
+        callback(err, instance);
+    };
+
     return Model;
 };
