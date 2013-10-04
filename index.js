@@ -48,24 +48,43 @@ module.exports = function (config) {
             obj.destroy();
             res.send(200, name + ' ' + id + ' destroyed');            
         });
-    }    
+    }
+    
+    function form(id, res) {
+        Model.findById(id, function (err, obj) {
+            if (obj) {
+                method = 'PUT';
+            } else {
+                obj = new Model();
+                method = 'POST';
+            }
+            res.render('form', {
+                method: method,
+                model: obj
+            })
+        }
+    }
     
     return function (req, res, next) {
         var id, match;
-        match = req.path.match(/^\/admin\/([^/]+)\/([^/]+)/);
-        id = match && match[2];
-        if (match && match[1] === name.toLowerCase()) {
-            if ('GET' === req.method && id) {
+        match = {
+            admin: req.path.match(/^\/admin\/([^/]+)\/([^/]+)/),
+            edit: req.path.match(/^\/edit\/([^/]+)\/([^/]+)/)
+        };
+        if (match.admin && match.admin[1] === name.toLowerCase()) {
+            id = match.admin[2];
+            if ('POST' === req.method) {
+                create(req.body.model, res);
+            } else if ('GET' === req.method && id) {
                 retrieve(id, res);
-            } else if ('PUT' === req.method) {
-                if (id) {
-                    update(id, res);
-                } else {
-                    create(req.body.model, res);
-                }
+            } else if ('PUT' === req.method && id) {
+                update(id, res);
             } else if ('DELETE' === req.method && id) {
                 destroy(id, res);
             }
+        } else if (match.edit && match.edit[1] === name.toLowerCase()) {
+            id = match.edit[2];
+            form(id, res);
         } else {
             next();
         }
