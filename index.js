@@ -12,9 +12,9 @@ module.exports = function (config) {
     jade = require('jade');
     ModelFactory = require('./src/model');
     
-    name = (config && config.name) || 'Model';
+    name = (config && config.name) || 'model';
     schema = (config && config.schema) || require('./src/schemas/page');
-    Model = new ModelFactory(schema);
+    Model = new ModelFactory(name, schema);
     
     function create(model, res) {
         console.log('creating model');
