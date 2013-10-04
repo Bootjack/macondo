@@ -1,13 +1,11 @@
 form(action="/admin/#{model._name}/#{model.id}", method="#{method}")
-    for (field in model._fields)
-        - switch (field.type.name) {
-        -   case 'text':
-        -   case 'number':
+    each field in model._fields
+        case field.type.name
+            when 'text' || 'number'
                 input(type="text", name="#{field.name}")
-        -       break;
-        -   case 'html':
+            when 'html'
                 textarea(name="#{field.name}")
-        -       break;
-        -   case 'date':
+
+            when 'date'
                 input(type="hidden", name="#{field.name}")
                 p TODO - Date selector GUI

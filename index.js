@@ -8,7 +8,8 @@
 module.exports = function (config) {
     'use strict';
     
-    var ModelFactory, Model, name, schema;
+    var ModelFactory, Model, jade, name, schema;
+    jade = require('jade');
     ModelFactory = require('./src/model');
     
     name = (config && config.name) || 'Model';
@@ -61,10 +62,20 @@ module.exports = function (config) {
                 obj = new Model();
                 method = 'POST';
             }
-            res.render('form', {
-                method: method,
-                model: obj
-            });
+            jade.renderFile(
+                __dirname + 'src/views/form.jade', 
+                {
+                    method: method,
+                    model: obj
+                },
+                function (err, html) {
+                    if (err) {
+                        res.send(500, err)
+                    } else {
+                        res.send(200, html);
+                    }
+                }
+            );
         });
     }
     
