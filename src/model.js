@@ -1,4 +1,6 @@
 module.exports = function (name, schema) {
+    'use strict';
+    
     var order, property, type;
 
     function Model(data) {

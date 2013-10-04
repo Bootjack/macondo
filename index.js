@@ -6,6 +6,8 @@
  */
 
 module.exports = function (config) {
+    'use strict';
+    
     var ModelFactory, Model, name, schema;
     ModelFactory = require('./src/model');
     
@@ -61,7 +63,7 @@ module.exports = function (config) {
             res.render('form', {
                 method: method,
                 model: obj
-            })
+            });
         }
     }
     
