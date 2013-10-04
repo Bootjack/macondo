@@ -5,6 +5,7 @@ module.exports = function (name, schema) {
 
     function Model(data) {
         var i, field;
+        data = data || {};
         for (i = 0; i < this._fields.length; i += 1) {
             field = this._fields[i];
             this[field.name] = data[field.name] || field.default;
