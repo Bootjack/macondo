@@ -18,7 +18,7 @@ module.exports = function (config) {
     
     function create(model, res) {
         console.log('creating model');
-        var instance = new Model(req.body.model);
+        var instance = new Model(model);
         instance.save(function (err, obj) {
             res.send(200, JSON.stringify(obj));    
         });
@@ -82,13 +82,13 @@ module.exports = function (config) {
     return function (req, res, next) {
         var id, match;
         match = {
-            admin: req.path.match(/^\/admin\/([^/]+)\/([^/]+)/),
-            edit: req.path.match(/^\/edit\/([^/]+)\/([^/]+)/)
+            admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
+            edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
         };
         if (match.admin && match.admin[1] === name.toLowerCase()) {
             id = match.admin[2];
             if ('POST' === req.method) {
-                create(req.body.model, res);
+                create(req.body, res);
             } else if ('GET' === req.method && id) {
                 retrieve(id, res);
             } else if ('PUT' === req.method && id) {
