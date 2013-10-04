@@ -22,12 +22,16 @@ module.exports = function (name, schema) {
     Model.prototype._name = name;
     Model.prototype._fields = [];
     
-    Model.prototype.save = function () {
-        return this;
+    Model.prototype.save = function (callback) {
+        var err, instance;
+        err = new Error('Not implemented');
+        callback(err, instance);
     };
     
     Model.prototype.destroy = function () {
-        return true;
+        var err;
+        err = new Error('Not implemented');
+        callback(err);
     };
     
     /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
