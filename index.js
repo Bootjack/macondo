@@ -53,6 +53,7 @@ module.exports = function (config) {
     }
     
     function form(id, res) {
+        var method;
         Model.findById(id, function (err, obj) {
             if (obj) {
                 method = 'PUT';
