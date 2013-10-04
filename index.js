@@ -63,7 +63,7 @@ module.exports = function (config) {
                 method = 'POST';
             }
             jade.renderFile(
-                __dirname + 'src/views/form.jade', 
+                __dirname + '/src/views/form.jade', 
                 {
                     method: method,
                     model: obj
