@@ -64,7 +64,7 @@ module.exports = function (config) {
                 method: method,
                 model: obj
             });
-        }
+        });
     }
     
     return function (req, res, next) {
