@@ -8,14 +8,16 @@
 module.exports = function (config) {
     'use strict';
     
-    var ModelFactory, Model, jade, name, schema;
+    var ModelFactory, Model, db, jade, name, schema;
     jade = require('jade');
     ModelFactory = require('./src/model');
     
+    db = (config && config.db);
     name = (config && config.name) || 'model';
     schema = (config && config.schema) || require('./src/schemas/page');
-    Model = new ModelFactory(name, schema);
-    
+
+    Model = new ModelFactory(name, schema, db);
+
     function create(model, res) {
         console.log('creating model');
         var instance = new Model(model);

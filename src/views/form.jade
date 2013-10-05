@@ -5,12 +5,12 @@ form(action="/admin/#{model._name}/#{model.id || ''}", method="#{method}")
             label= field.name
             case field.type.name
                 when 'text'
-                    input(type="text", name="#{field.name}", value="#{model[field.name] || field.type.default}")
+                    input(type="text", name="#{field.name}", value="#{model[field.name]}")
                 when 'number'
-                    input(type="text", name="#{field.name}", size="6", value="#{model[field.name] || field.type.default}")
+                    input(type="text", name="#{field.name}", size="6", value="#{model[field.name]}")
+                when 'date'
+                    input(type="hidden", name="#{field.name}", value="#{model[field.name]}")
+                    p TODO - Date selector GUI
                 when 'html'
                     textarea(name="#{field.name}")= model[field.name] || field.type.default
-                when 'date'
-                    input(type="hidden", name="#{field.name}", value="#{model[field.name] || field.type.default}")
-                    p TODO - Date selector GUI
         input(type="submit", value="Save")

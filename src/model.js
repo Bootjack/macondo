@@ -1,4 +1,4 @@
-module.exports = function (name, schema) {
+module.exports = function (name, schema, database) {
     'use strict';
     
     var order, property, type;
@@ -20,19 +20,67 @@ module.exports = function (name, schema) {
     };
     
     Model.prototype._name = name;
-    Model.prototype._fields = [];
-    
+    Model.prototype._fields = [];  
+
+    Model.findById = function (id, callback) {
+        var err, instance;
+        err = new Error('Not implemented');
+        callback(err, instance);
+    };
+
     Model.prototype.save = function (callback) {
         var err, instance;
         err = new Error('Not implemented');
         callback(err, instance);
     };
     
-    Model.prototype.destroy = function () {
+    Model.prototype.destroy = function (callback) {
         var err;
         err = new Error('Not implemented');
         callback(err);
     };
+    
+    (function (schema) {
+        var Mongoose, Schema, field;
+        if (database.name.match('mongo')) {
+            for (field in schema) {
+                if (schema.hasOwnProperty(field)) {
+                    switch (schema[field].type) {
+                        case 'Text':
+                        case 'Html':
+                            schema[field] = String;
+                            break;
+                        case 'Number':
+                            schema[field] = Number;
+                            break;
+                        case 'Date':
+                            schema[field] = Date;
+                            break;
+                        default:
+                            schema[field] = Object;
+                    }
+                }
+            }
+            Mongoose = require('mongoose');
+            Schema = Mongoose.Schema(schema);
+            MongoModel = Mongoose.model(name, Schema);
+            Model.prototype.findById = function (id, callback) {
+                return MongoModel.findById(id, callback);
+            };
+            Model.prototype.save = function (callback) {
+                var cb, self;
+                self = this;
+                cb = function (err, instance) {
+                    self._id = instance._id;
+                    callback(err, instance);
+                }
+                return MongoModel.create(this, callback);
+            };
+            Model.prototype.destroy = function (callback) {
+                return MongoModel.remove({id: this._id}, callback);
+            };
+        }
+    }(schema));
     
     /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
     for (property in schema) {
@@ -46,12 +94,6 @@ module.exports = function (name, schema) {
             }
         }
     }
-    
-    Model.findById = function (id, callback) {
-        var err, instance;
-        err = new Error('Not implemented');
-        callback(err, instance);
-    };
 
     return Model;
 };
