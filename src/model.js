@@ -41,7 +41,7 @@ module.exports = function (name, schema, database) {
     };
     
     (function (schema) {
-        var Mongoose, Schema, field;
+        var Mongoose, MongoModel, Schema, field;
         if (database.name.match('mongo')) {
             for (field in schema) {
                 if (schema.hasOwnProperty(field)) {
