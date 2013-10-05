@@ -9,7 +9,7 @@ form(action="/admin/#{model._name}/#{model.id || ''}", method="#{method}")
                 when 'number'
                     input(type="text", name="#{field.name}", size="6", value="#{model[field.name] || field.default}")
                 when 'html'
-                    textarea(name="#{field.name}", value="#{model[field.name] || field.default}")
+                    textarea(name="#{field.name}")= model[field.name] || field.default
                 when 'date'
                     input(type="hidden", name="#{field.name}", value="#{model[field.name] || field.default}")
                     p TODO - Date selector GUI
