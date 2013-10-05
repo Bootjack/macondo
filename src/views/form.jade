@@ -1,11 +1,13 @@
 form(action="/admin/#{model._name}/#{model.id || ''}", method="#{method}")
-    each field in model._fields
-        case field.type.name
-            when 'text' || 'number'
-                input(type="text", name="#{field.name}")
-            when 'html'
-                textarea(name="#{field.name}")
-
-            when 'date'
-                input(type="hidden", name="#{field.name}")
-                p TODO - Date selector GUI
+    fieldset
+        legend= model._name
+        each field in model._fields
+            label= field.name
+            case field.type.name
+                when 'text' || 'number'
+                    input(type="text", name="#{field.name}")
+                when 'html'
+                    textarea(name="#{field.name}")
+                when 'date'
+                    input(type="hidden", name="#{field.name}")
+                    p TODO - Date selector GUI
