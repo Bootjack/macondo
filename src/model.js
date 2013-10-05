@@ -79,6 +79,7 @@ module.exports = function (name, schema, database) {
             Model.prototype.destroy = function (callback) {
                 return MongoModel.remove({id: this._id}, callback);
             };
+            console.log(database.url);
             Mongoose.connect(database.url);
         }
     }(schema));
