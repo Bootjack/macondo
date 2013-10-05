@@ -4,11 +4,13 @@ form(action="/admin/#{model._name}/#{model.id || ''}", method="#{method}")
         each field in model._fields
             label= field.name
             case field.type.name
-                when ('text' || 'number')
+                when 'text'
                     input(type="text", name="#{field.name}")
+                when 'number'
+                    input(type="text", name="#{field.name}", size="6")
                 when 'html'
                     textarea(name="#{field.name}")
                 when 'date'
                     input(type="hidden", name="#{field.name}")
                     p TODO - Date selector GUI
-        input(type="submit") Save
+        input(type="submit", value="Save")
