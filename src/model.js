@@ -40,6 +40,19 @@ module.exports = function (name, schema, database) {
         callback(err);
     };
     
+    /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
+    for (property in schema) {
+        if (schema.hasOwnProperty(property)) {
+            order = schema[property].order;
+            type = Model.prototype.DataType[schema[property].type] || Model.prototype.DataType.Text;
+            if ('undefined' !== typeof order && order < this._fields.length) {
+                Model.prototype._fields.splice(order, 0, {name: property, type: type});
+            } else {
+                Model.prototype._fields.push({name: property, type: type});
+            }
+        }
+    }
+    
     (function (schema) {
         var Mongoose, MongoModel, Schema, field;
         if (database.name.match('mongo')) {
@@ -82,19 +95,6 @@ module.exports = function (name, schema, database) {
             };
         }
     }(schema));
-    
-    /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
-    for (property in schema) {
-        if (schema.hasOwnProperty(property)) {
-            order = schema[property].order;
-            type = Model.prototype.DataType[schema[property].type] || Model.prototype.DataType.Text;
-            if ('undefined' !== typeof order && order < this._fields.length) {
-                Model.prototype._fields.splice(order, 0, {name: property, type: type});
-            } else {
-                Model.prototype._fields.push({name: property, type: type});
-            }
-        }
-    }
 
     return Model;
 };
