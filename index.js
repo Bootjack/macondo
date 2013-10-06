@@ -21,6 +21,7 @@ module.exports = function (config) {
     function create(model, res) {
         console.log('creating model');
         var instance = new Model(model);
+        console.log(instance);
         instance.save(function (err, obj) {
             res.send(200, JSON.stringify(obj));    
         });

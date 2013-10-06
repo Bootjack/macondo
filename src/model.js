@@ -53,8 +53,8 @@ module.exports = function (name, schema, database) {
         }
     }
     
-    (function (schema) {
-        var Mongoose, MongoModel, Schema, field;
+    (function () {
+        var Mongoose, MongoModel, MongoSchema, field;
         if (database.name.match('mongo')) {
             for (field in schema) {
                 if (schema.hasOwnProperty(field)) {
@@ -76,8 +76,8 @@ module.exports = function (name, schema, database) {
             }
             console.log(schema);
             Mongoose = database.connection;
-            Schema = Mongoose.Schema(schema);
-            MongoModel = Mongoose.model(name, Schema);
+            MongoSchema = Mongoose.Schema(schema);
+            MongoModel = Mongoose.model(name, MongoSchema);
             Model.prototype.findById = function (id, callback) {
                 return MongoModel.findById(id, callback);
             };
@@ -93,8 +93,9 @@ module.exports = function (name, schema, database) {
             Model.prototype.destroy = function (callback) {
                 return MongoModel.remove({id: this._id}, callback);
             };
+            console.log(new Model());
         }
-    }(schema));
+    }());
 
     return Model;
 };
