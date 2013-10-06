@@ -61,7 +61,7 @@ module.exports = function (name, schema, database) {
                     }
                 }
             }
-            Mongoose = database.instance;
+            Mongoose = database.connection;
             Schema = Mongoose.Schema(schema);
             MongoModel = Mongoose.model(name, Schema);
             Model.prototype.findById = function (id, callback) {
