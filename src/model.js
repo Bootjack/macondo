@@ -61,7 +61,7 @@ module.exports = function (name, schema, database) {
                     }
                 }
             }
-            Mongoose = require('mongoose');
+            Mongoose = database.instance;
             Schema = Mongoose.Schema(schema);
             MongoModel = Mongoose.model(name, Schema);
             Model.prototype.findById = function (id, callback) {
@@ -79,8 +79,6 @@ module.exports = function (name, schema, database) {
             Model.prototype.destroy = function (callback) {
                 return MongoModel.remove({id: this._id}, callback);
             };
-            console.log(database.url);
-            Mongoose.connect(database.url);
         }
     }(schema));
     
