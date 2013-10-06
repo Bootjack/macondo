@@ -61,6 +61,7 @@ module.exports = function (name, schema, database) {
                     }
                 }
             }
+            console.log(schema);
             Mongoose = database.connection;
             Schema = Mongoose.Schema(schema);
             MongoModel = Mongoose.model(name, Schema);
