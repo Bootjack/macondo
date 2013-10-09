@@ -1,14 +1,52 @@
+var mongoose = require('mongoose');
+
 module.exports = function (name, schema, database) {
     'use strict';
     
     var order, property, type;
 
     function Model(data) {
-        var i, field;
+        var i, field, mongoSchema, mongoSchemaObj;
         data = data || {};
+        mongoSchemaObj = {};
         for (i = 0; i < this._fields.length; i += 1) {
             field = this._fields[i];
+            switch (field.type) {
+                case 'Text':
+                case 'Html':
+                    mongoSchemaObj[field.name] = String;
+                    break;
+                case 'Number':
+                    mongoSchemaObj[field.name] = Number;
+                    break;
+                case 'Date':
+                    mongoSchemaObj[field.name] = Date;
+                    break;
+                default:
+                    mongoSchemaObj[field.name] = Object;
+            }
+            mongoSchema = mongoose.Schema(mongoSchemaObj);
             this[field.name] = data[field.name] || field.default;
+        }
+
+
+        for (field in schema) {
+            if (schema.hasOwnProperty(field)) {
+                switch (schema[field].type) {
+                    case 'Text':
+                    case 'Html':
+                        schema[field] = String;
+                        break;
+                    case 'Number':
+                        schema[field] = Number;
+                        break;
+                    case 'Date':
+                        schema[field] = Date;
+                        break;
+                    default:
+                        schema[field] = Object;
+                }
+            }
         }
     }
 
@@ -56,24 +94,7 @@ module.exports = function (name, schema, database) {
     (function () {
         var Mongoose, MongoModel, MongoSchema, field;
         if (database.name.match('mongo')) {
-            for (field in schema) {
-                if (schema.hasOwnProperty(field)) {
-                    switch (schema[field].type) {
-                        case 'Text':
-                        case 'Html':
-                            schema[field] = String;
-                            break;
-                        case 'Number':
-                            schema[field] = Number;
-                            break;
-                        case 'Date':
-                            schema[field] = Date;
-                            break;
-                        default:
-                            schema[field] = Object;
-                    }
-                }
-            }
+
             console.log(schema);
             Mongoose = database.connection;
             MongoSchema = Mongoose.Schema(schema);
