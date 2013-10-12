@@ -56,13 +56,17 @@ module.exports = function (config) {
     }
     
     function form(id, res) {
-        var method;
-        console.log(Model);
+        var field, method;
         Model.findById(id, function (err, obj) {
             if (obj) {
                 method = 'PUT';
             } else {
                 obj = new Model();
+                for (field in Model._fields) {
+                    if (Model._fields.hasOwnProperty(field)) {
+                        obj[field] = Model._fields[field].default;
+                    }
+                }
                 method = 'POST';
             }
             console.log(obj);

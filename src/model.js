@@ -16,7 +16,7 @@ module.exports = function (name, schema) {
     mongoSchema = {};
     for (property in schema) {
         if (schema.hasOwnProperty(property) && schema[property].type) {
-            fields[property] = schema[property].type;
+            fields[property] = dataTypes[schema[property].type];
             switch(schema[property].type) {
                 case 'text':
                 case 'html':
