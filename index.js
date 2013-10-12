@@ -70,6 +70,7 @@ module.exports = function (config) {
                 method = 'POST';
             }
             console.log(obj);
+            console.log(Model._fields);
             jade.renderFile(
                 __dirname + '/src/views/form.jade', 
                 {
