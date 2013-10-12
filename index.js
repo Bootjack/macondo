@@ -62,10 +62,10 @@ module.exports = function (config) {
                 method = 'PUT';
             } else {
                 obj = new Model();
-                console.log(Model._fields);
-                for (field in Model._fields) {
-                    if (Model._fields.hasOwnProperty(field)) {
-                        obj[field] = Model._fields[field].default;
+                console.log(Model.prototype._fields);
+                for (field in Model.prototype._fields) {
+                    if (Model.prototype._fields.hasOwnProperty(field)) {
+                        obj[field] = Model.prototype._fields[field].default;
                     }
                 }
                 method = 'POST';
