@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 module.exports = function (name, schema) {
     'use strict';
     
-    var dataTypes, fields, mongoModel, mongoSchema, order, property, type;
+    var Model, dataTypes, fields, mongoSchema, order, property, type;
 
     dataTypes = {
         'text': {name: 'text', default: ''},
@@ -34,14 +34,10 @@ module.exports = function (name, schema) {
         }
     }
     if (-1 === mongoose.modelNames().indexOf(name)) {
-        mongoModel = mongoose.model(name, mongoose.Schema(mongoSchema));
+        Model = mongoose.model(name, mongoose.Schema(mongoSchema));
     } else {
-        mongoModel = mongoose.model(name);
+        Model = mongoose.model(name);
     }
-    
-    function Model (data) {
-        return new mongoModel(data);
-    };
     
     Model.prototype._name = name;
     Model.prototype._fields = fields;
