@@ -15,7 +15,7 @@ module.exports = function (config) {
     name = (config && config.name) || 'model';
     schema = (config && config.schema) || require('./src/schemas/page');
 
-    Model = new ModelFactory(name, schema, db);
+    Model = new ModelFactory(name, schema);
 
     function create(data, res) {
         console.log('creating model');

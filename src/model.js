@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-module.exports = function (name, schema, database) {
+module.exports = function (name, schema) {
     'use strict';
     
     var dataTypes, fields, mongoModel, mongoSchema, order, property, type;
