@@ -57,6 +57,7 @@ module.exports = function (config) {
     
     function form(id, res) {
         var method;
+        console.log(Model);
         Model.findById(id, function (err, obj) {
             if (obj) {
                 method = 'PUT';
@@ -64,6 +65,7 @@ module.exports = function (config) {
                 obj = new Model();
                 method = 'POST';
             }
+            console.log(obj);
             jade.renderFile(
                 __dirname + '/src/views/form.jade', 
                 {
