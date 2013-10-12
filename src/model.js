@@ -3,120 +3,43 @@ var mongoose = require('mongoose');
 module.exports = function (name, schema, database) {
     'use strict';
     
-    var order, property, type;
+    var dataTypes, fields, mongoModel, mongoSchema, order, property, type;
 
-    function Model(data) {
-        var i, field, mongoSchema, mongoSchemaObj;
-        data = data || {};
-        mongoSchemaObj = {};
-        for (i = 0; i < this._fields.length; i += 1) {
-            field = this._fields[i];
-            switch (field.type) {
-                case 'Text':
-                case 'Html':
-                    mongoSchemaObj[field.name] = String;
+    dataTypes = {
+        'text': {name: 'text', default: ''},
+        'html': {name: 'html', default: '<div></div>'},
+        'number': {name: 'number', default: 0},
+        'date': {name: 'date', default: new Date().toUTCString()}
+    };
+    
+    mongoSchema = {};
+    for (property in schema) {
+        if (schema.hasOwnProperty(property) && schema[property].type) {
+            fields[property] = schema[property].type;
+            switch(schema[property].type) {
+                case 'text':
+                case 'html':
+                    mongoSchema[property] = String;
                     break;
-                case 'Number':
-                    mongoSchemaObj[field.name] = Number;
+                case 'number':
+                    mongoSchema[property] = Number;
                     break;
-                case 'Date':
-                    mongoSchemaObj[field.name] = Date;
+                case 'date':
+                    mongoSchema[property] = Date;
                     break;
                 default:
-                    mongoSchemaObj[field.name] = Object;
-            }
-            mongoSchema = mongoose.Schema(mongoSchemaObj);
-            this[field.name] = data[field.name] || field.default;
-        }
-
-
-        for (field in schema) {
-            if (schema.hasOwnProperty(field)) {
-                switch (schema[field].type) {
-                    case 'Text':
-                    case 'Html':
-                        schema[field] = String;
-                        break;
-                    case 'Number':
-                        schema[field] = Number;
-                        break;
-                    case 'Date':
-                        schema[field] = Date;
-                        break;
-                    default:
-                        schema[field] = Object;
-                }
+                    mongoSchema[property] = Object;
             }
         }
     }
+    mongoModel = mongoose.model(name) || mongoose.model(name, mongoSchema);
 
-    Model.prototype.DataType = {
-        'Text': {name: 'text', default: ''},
-        'Html': {name: 'html', default: '<div></div>'},
-        'Number': {name: 'number', default: 0},
-        'Date': {name: 'date', default: new Date().toUTCString()}
+    function Model (data) {
+        return new mongoModel(data);
     };
     
     Model.prototype._name = name;
-    Model.prototype._fields = [];  
-
-    Model.findById = function (id, callback) {
-        var err, instance;
-        err = new Error('Not implemented');
-        callback(err, instance);
-    };
-
-    Model.prototype.save = function (callback) {
-        var err, instance;
-        err = new Error('Not implemented');
-        callback(err, instance);
-    };
-    
-    Model.prototype.destroy = function (callback) {
-        var err;
-        err = new Error('Not implemented');
-        callback(err);
-    };
-    
-    /* Create an ordered list of field names and types, and also assign any field to the returned model object. */
-    for (property in schema) {
-        if (schema.hasOwnProperty(property)) {
-            order = schema[property].order;
-            type = Model.prototype.DataType[schema[property].type] || Model.prototype.DataType.Text;
-            if ('undefined' !== typeof order && order < this._fields.length) {
-                Model.prototype._fields.splice(order, 0, {name: property, type: type});
-            } else {
-                Model.prototype._fields.push({name: property, type: type});
-            }
-        }
-    }
-    
-    (function () {
-        var Mongoose, MongoModel, MongoSchema, field;
-        if (database.name.match('mongo')) {
-
-            console.log(schema);
-            Mongoose = database.connection;
-            MongoSchema = Mongoose.Schema(schema);
-            MongoModel = Mongoose.model(name, MongoSchema);
-            Model.prototype.findById = function (id, callback) {
-                return MongoModel.findById(id, callback);
-            };
-            Model.prototype.save = function (callback) {
-                var cb, self;
-                self = this;
-                cb = function (err, instance) {
-                    self._id = instance._id;
-                    callback(err, instance);
-                }
-                return MongoModel.create(this, callback);
-            };
-            Model.prototype.destroy = function (callback) {
-                return MongoModel.remove({id: this._id}, callback);
-            };
-            console.log(new Model());
-        }
-    }());
+    Model.prototype._fields = fields;
 
     return Model;
 };
