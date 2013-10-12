@@ -64,6 +64,7 @@ module.exports = function (config) {
                 obj = new Model();
                 for (field in Model._fields) {
                     if (Model._fields.hasOwnProperty(field)) {
+                        console.log(Model._fields[field]);
                         obj[field] = Model._fields[field].default;
                     }
                 }
