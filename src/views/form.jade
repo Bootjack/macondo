@@ -1,16 +1,17 @@
 form(action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
     fieldset
         legend= model._name
-        each field, value in model._fields
-            label= field
-            case value.name
+        p Showing #{model._fields.length} fields
+        each field, name in model._fields
+            label= name
+            case field.name
                 when 'text'
-                    input(type="text", name="#{field}", value="#{instance[field]}")
+                    input(type="text", name="#{name}", value="#{instance[name]}")
                 when 'number'
-                    input(type="text", name="#{field}", size="6", value="#{instance[field]}")
+                    input(type="text", name="#{name}", size="6", value="#{instance[name]}")
                 when 'date'
-                    input(type="hidden", name="#{field}", value="#{instance[field]}")
+                    input(type="hidden", name="#{name}", value="#{instance[name]}")
                     p TODO - Date selector GUI
                 when 'html'
-                    textarea(name="#{field}")= instance[field] || value.default
+                    textarea(name="#{field}")= instance[name]
         input(type="submit", value="Save")
