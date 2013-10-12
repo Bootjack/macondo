@@ -33,8 +33,12 @@ module.exports = function (name, schema) {
             }
         }
     }
-    mongoModel = mongoose.model(name) || mongoose.model(name, mongoSchema);
-
+    if (-1 === mongoose.modelNames().indexOf(name)) {
+        mongoModel = mongoose.model(name, mongoose.Schema(mongoSchema));
+    } else {
+        mongoModel = mongoose.model(name);
+    }
+    
     function Model (data) {
         return new mongoModel(data);
     };
