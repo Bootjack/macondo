@@ -62,9 +62,9 @@ module.exports = function (config) {
                 method = 'PUT';
             } else {
                 obj = new Model();
+                console.log(Model._fields);
                 for (field in Model._fields) {
                     if (Model._fields.hasOwnProperty(field)) {
-                        console.log(Model._fields[field]);
                         obj[field] = Model._fields[field].default;
                     }
                 }
