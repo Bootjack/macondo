@@ -1,7 +1,6 @@
 form(action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
     fieldset
         legend= model._name
-        p Showing #{model._fields.length} fields
         each field, name in model._fields
             label= name
             case field.name

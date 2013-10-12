@@ -12,7 +12,7 @@ module.exports = function (name, schema) {
         'date': {name: 'date', default: new Date().toUTCString()}
     };
     
-    fields = [];
+    fields = {};
     mongoSchema = {};
     for (property in schema) {
         if (schema.hasOwnProperty(property) && schema[property].type) {
