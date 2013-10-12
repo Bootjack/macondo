@@ -39,8 +39,8 @@ module.exports = function (name, schema) {
         Model = mongoose.model(name);
     }
     
-    Model.prototype._name = name;
-    Model.prototype._fields = fields;
+    Model._name = name;
+    Model._fields = fields;
 
     return Model;
 };
