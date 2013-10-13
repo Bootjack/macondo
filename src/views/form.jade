@@ -12,5 +12,5 @@ form(action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
                     input(type="hidden", name="#{name}", value="#{instance[name]}")
                     p TODO - Date selector GUI
                 when 'html'
-                    textarea(name="#{field}")= instance[name]
+                    textarea(name="#{name}")= instance[name]
         input(type="submit", value="Save")
