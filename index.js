@@ -50,7 +50,7 @@ module.exports = function (config) {
     function destroy(id, res) {
         console.log('destroying model');        
         Model.findById(id, function (err, obj) {
-            obj.destroy();
+            obj.remove();
             res.send(200, name + ' ' + id + ' destroyed');            
         });
     }
