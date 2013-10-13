@@ -92,6 +92,7 @@ module.exports = function (config) {
         var id, match;
         match = {
             admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
+            delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
             edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
         };
         if (match.admin && match.admin[1] === name.toLowerCase()) {
@@ -105,6 +106,9 @@ module.exports = function (config) {
             } else if ('DELETE' === req.method && id) {
                 destroy(id, res);
             }
+        } else if (match.delete && match.delete[1] === name.toLowerCase()) {
+            id = match.delete[2];
+            destroy(id, res);
         } else if (match.edit && match.edit[1] === name.toLowerCase()) {
             id = match.edit[2];
             form(id, res);
