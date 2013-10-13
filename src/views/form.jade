@@ -1,4 +1,4 @@
-form(action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
+form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
     fieldset
         legend= model._name
         each field, name in model._fields
@@ -13,4 +13,5 @@ form(action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
                     p TODO - Date selector GUI
                 when 'html'
                     textarea(name="#{name}")= instance[name]
-        input(type="submit", value="Save")
+    input(type="button", value="Delete", onclick="(function () {var form = document.getElementById('#{model._name}-edit-form'); form.method='DELETE'; form.submit();}())")
+    input(type="submit", value="Save")
