@@ -6,13 +6,15 @@ express = require('express');
 macondo = require('../index.js');
 mongoose = require('mongoose');
 
+mongoose.connect('localhost');
+
 app = new express();
 app.set('port', 3300);
 app.use(macondo({
     name: 'production',
-    scema: {
-        title: 'text',
-        playwright: 'text'
+    schema: {
+        title: {type: 'text'},
+        playwright: {type: 'text'}
     }
 }));
 

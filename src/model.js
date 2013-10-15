@@ -41,6 +41,6 @@ module.exports = function (name, schema) {
     
     Model._name = name;
     Model._fields = fields;
-
+    
     return Model;
 };
