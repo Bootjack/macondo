@@ -19,6 +19,7 @@ module.exports = function (config) {
 
     function create(data, res) {
         console.log('creating model');
+        console.log(data);
         var instance = new Model(data);
         console.log(instance);
         instance.save(function (err, obj) {

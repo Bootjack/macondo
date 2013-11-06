@@ -1,15 +1,10 @@
 var Model = require('../model');
 
-module.exports = function () {
-    var fields, page;
-    page = {};
-    fields = ['title', 'author', 'publicationDate', 'revisionDate', 'template', 'regions'];
-    if (arguments && arguments.length) {
-        for (property in arguments[0]) {
-            if (-1 !== fields.indexOf(property)) {
-                page[property] = arguments[property];
-            }
-        }
-    }
-    return page;
+module.exports = {
+    publicationDate: {type: 'date'},
+    revisionDate: {type: 'date', private: true},
+    title: {type: 'html'},
+    author: {type: 'html'},
+    template: {type: 'text'},
+    regions: {type: 'text'}
 };

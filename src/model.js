@@ -16,7 +16,10 @@ module.exports = function (name, schema) {
     mongoSchema = {};
     for (property in schema) {
         if (schema.hasOwnProperty(property) && schema[property].type) {
-            fields[property] = dataTypes[schema[property].type];
+            fields[property] = {};
+            fields[property].name = dataTypes[schema[property].type].name;
+            fields[property].default = dataTypes[schema[property].type].default;
+            fields[property].private = schema[property].private;
             switch(schema[property].type) {
                 case 'text':
                 case 'html':

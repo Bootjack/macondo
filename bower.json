@@ -1,0 +1,23 @@
+{
+  "name": "macondo",
+  "main": "index.js",
+  "version": "0.0.3",
+  "homepage": "https://github.com/Bootjack/macondo",
+  "description": "Description",
+  "authors": [
+    "Jason Hinebaugh"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "tinymce": "~4.0.10",
+    "datepickr": "*"
+  }
+}
