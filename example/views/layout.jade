@@ -1,0 +1,15 @@
+!!!5
+html
+    head
+        title Macondo Example
+            
+    body
+        h1 Macondo Example
+        h2 Menu
+            each menu, name in macondo.menus
+                h3= name
+                ul
+                    each item in menu
+                        li
+                            -var url = item.path && item.path.replace(/^(\/)/, '/').replace(/\s+/g, '-');
+                            a(href="#{url}", title="#{item._id}")!= item.title

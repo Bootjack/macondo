@@ -11,20 +11,27 @@ mongoose.connect('localhost/macondo');
 
 app = new express();
 app.set('port', 3300);
-app.use(express.urlencoded());
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(
-    macondo({
-        name: 'production',
-        schema: {
-            title: {type: 'text'},
-            playwright: {type: 'text'}
+app.use(express.urlencoded());
+app.use(macondo({
+    models: {
+        'page': {
+            schema: null,
+            hasMenu: true
+        },
+        'production' : {
+            schema: {
+                title: {type: 'text'},
+                playwright: {type: 'text'}
+            }
         }
-    })
-);
-app.use(
-    macondo({name: 'page'})
-);
+    }
+}));
+
+app.get('/', function (req, res) {res.render('layout')});
 
 // Fire it up
 app.listen(app.get('port'), function(){

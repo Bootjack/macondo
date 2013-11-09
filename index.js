@@ -8,75 +8,90 @@
 module.exports = function (config) {
     'use strict';
     
-    var ModelFactory, Model, jade, name, schema;
+    var ModelFactory, models, menus, model, jade;
     jade = require('jade');
     ModelFactory = require('./src/model');
-    
-    name = (config && config.name) || 'model';
-    schema = (config && config.schema) || require('./src/schemas/page');
+    models = {};
+    menus = [];
 
-    Model = new ModelFactory(name, schema);
+    for (model in config.models) {
+        if (config.models.hasOwnProperty(model)) {
+            models[model] = new ModelFactory(
+                model, config.models[model].schema || require('./src/schemas/' + model)
+            );
+            if (config.models[model].hasMenu) {
+                menus.push(models[model]);
+            }
+        }
+    }
 
-    function create(data, res) {
+    function create(modelName, data, res) {
         console.log('creating model');
-        console.log(data);
-        var instance = new Model(data);
-        console.log(instance);
+        var instance = new models[modelName](data);
         instance.save(function (err, obj) {
-            res.send(200, JSON.stringify(obj));    
+            res.send(200, JSON.stringify(obj));
         });
     }
     
-    function retrieve(id, res) {
+    function retrieve(modelName, id, res) {
         console.log('retrieving model');
-        var instance = Model.findById(id, function(err, obj) {
+        models[modelName].findById(id, function(err, obj) {
             res.send(200, JSON.stringify(obj));        
         });
     }
 
-    function update(id, res) {
+    function update(modelName, id, data, res) {
         console.log('updating model');
-        var instance, property;
-        instance = Model.findById(id);
-        for (property in req.body.model) {
-            if (req.body.model.hasOwnProperty(property)) {
-                instance[property] = req.body.model[property];
+        var property;
+        console.log(id);
+        models[modelName].findById(id, function (err, instance) {
+            if (!err && instance) {
+                for (property in data) {
+                    console.log(instance);
+                    if (data.hasOwnProperty(property)) {
+                        instance[property] = data[property];
+                    }
+                }
+                instance.save(function(err, obj) {
+                    res.send(200, JSON.stringify(obj));
+                });
+            } else {
+                create(modelName, data, res);
             }
-        }
-        instance.save(function(err, obj) {
-            res.send(200, JSON.stringify(obj));            
         });
     }
     
-    function destroy(id, res) {
-        console.log('destroying model');        
-        Model.findById(id, function (err, obj) {
-            obj.remove();
-            res.send(200, name + ' ' + id + ' destroyed');            
+    function destroy(modelName, id, res) {
+        console.log('destroying model');
+        models[modelName].findById(id, function (err, obj) {
+            if (!err && obj) {
+                obj.remove();
+                res.send(200, modelName + ' ' + id + ' destroyed');
+            } else {
+                res.send(500, err);
+            }
         });
     }
     
-    function form(id, res) {
+    function form(modelName, id, res) {
         var field, method;
-        Model.findById(id, function (err, obj) {
+        models[modelName].findById(id, function (err, obj) {
             if (obj) {
                 method = 'PUT';
             } else {
-                obj = new Model();
-                console.log(Model._fields);
-                for (field in Model._fields) {
-                    if (Model._fields.hasOwnProperty(field)) {
-                        obj[field] = Model._fields[field].default;
+                obj = new models[modelName]();
+                for (field in models[modelName]._fields) {
+                    if (models[modelName]._fields.hasOwnProperty(field)) {
+                        obj[field] = models[modelName]._fields[field].default;
                     }
                 }
                 method = 'POST';
             }
-            console.log(obj);
             jade.renderFile(
                 __dirname + '/src/views/form.jade', 
                 {
                     method: method,
-                    model: Model,
+                    model: models[modelName],
                     instance: obj
                 },
                 function (err, html) {
@@ -91,31 +106,52 @@ module.exports = function (config) {
     }
     
     return function (req, res, next) {
-        var id, match;
-        match = {
-            admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
-            delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
-            edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
-        };
-        if (match.admin && match.admin[1] === name.toLowerCase()) {
-            id = match.admin[2];
-            if ('POST' === req.method) {
-                create(req.body, res);
-            } else if ('GET' === req.method && id) {
-                retrieve(id, res);
-            } else if ('PUT' === req.method && id) {
-                update(id, res);
-            } else if ('DELETE' === req.method && id) {
-                destroy(id, res);
-            }
-        } else if (match.delete && match.delete[1] === name.toLowerCase()) {
-            id = match.delete[2];
-            destroy(id, res);
-        } else if (match.edit && match.edit[1] === name.toLowerCase()) {
-            id = match.edit[2];
-            form(id, res);
-        } else {
-            next();
+        var i, id, match, name;
+        req.app.locals.macondo = {};
+        req.app.locals.macondo.menus = {};
+
+        for (i = 0; i < menus.length; i += 1) {
+            (function (name) {
+                menus[i].find({isInMenu: true}, function (err, arr) {
+                    if (!err) {
+                        console.log(name);
+                        req.app.locals.macondo.menus[name] = arr;
+
+                        match = {
+                            admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
+                            delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
+                            edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
+                        };
+                        if (match.admin && models.hasOwnProperty(match.admin[1])) {
+                            id = match.admin[2];
+                            name = match.admin[1].toLowerCase();
+                            if ('POST' === req.method) {
+                                if (id) {
+                                    update(name, id, req.body, res);
+                                } else {
+                                    create(name, req.body, res);
+                                }
+                            } else if ('GET' === req.method && id) {
+                                retrieve(name, id, res);
+                            } else if (('PUT' === req.method) && id) {
+                                update(name, id, res);
+                            } else if ('DELETE' === req.method && id) {
+                                destroy(name, id, res);
+                            }
+                        } else if (match.delete && models.hasOwnProperty(match.delete[1])) {
+                            id = match.delete[2];
+                            name = match.delete[1].toLowerCase();
+                            destroy(name, id, res);
+                        } else if (match.edit && models.hasOwnProperty(match.edit[1])) {
+                            id = match.edit[2];
+                            name = match.edit[1].toLowerCase();
+                            form(name, id, res);
+                        } else {
+                            next();
+                        }
+                    }
+                });                
+            }(menus[i].modelName));
         }
     };
 };

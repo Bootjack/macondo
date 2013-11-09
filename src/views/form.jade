@@ -1,13 +1,15 @@
 link(rel="stylesheet", type="text/css", href="/macondo.css")
 link(rel="stylesheet", type="text/css", href="/datepickr.css")
 
-form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance.id || ''}", method="#{method}")
+form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id || ''}", method="POST")
     fieldset
         legend= model._name
         each field, name in model._fields
             if (!field.private)
                 label= name.replace(/([A-Z])/g, ' $1')
                 case field.name
+                    when 'boolean'
+                        input(type="checkbox", name="#{name}", value="true", checked=(instance[name] ? 'checked' : null))
                     when 'text'
                         input(type="text", name="#{name}", value="#{instance[name]}")
                     when 'number'
@@ -16,7 +18,7 @@ form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance.id 
                         //input(type="hidden", name="#{name}", value="#{instance[name]}")
                         input.datepickr(id="#{model._name}-edit-form--#{name}", name="#{name}", type="text", value="#{instance[name]}")
                     when 'html'
-                        textarea.tinymce(name="#{name}")= instance[name]            
+                        textarea.tinymce(name="#{name}")= instance[name]   
     input(type="button", value="Delete", onclick="(function () {var form = document.getElementById('#{model._name}-edit-form'); form.method='DELETE'; form.submit();}())")
     input(type="submit", value="Save")
 

@@ -6,8 +6,9 @@ module.exports = function (name, schema) {
     var Model, dataTypes, fields, mongoSchema, order, property, type;
 
     dataTypes = {
+        'boolean': {name: 'boolean', default: false},
         'text': {name: 'text', default: ''},
-        'html': {name: 'html', default: '<div></div>'},
+        'html': {name: 'html', default: ''},
         'number': {name: 'number', default: 0},
         'date': {name: 'date', default: new Date().toUTCString()}
     };
@@ -21,6 +22,9 @@ module.exports = function (name, schema) {
             fields[property].default = dataTypes[schema[property].type].default;
             fields[property].private = schema[property].private;
             switch(schema[property].type) {
+                case 'boolean':
+                    mongoSchema[property] = Boolean;
+                    break;
                 case 'text':
                 case 'html':
                     mongoSchema[property] = String;
