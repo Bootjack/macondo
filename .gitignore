@@ -1,4 +1,5 @@
-# NPM
+# Dependencies
+bower_components
 node_modules
 
 # Grunt

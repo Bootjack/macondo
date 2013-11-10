@@ -49,5 +49,7 @@ module.exports = function (name, schema) {
     Model._name = name;
     Model._fields = fields;
     
+    console.log('macondo model loaded');    
+    
     return Model;
 };
