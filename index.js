@@ -152,8 +152,9 @@ module.exports = function (config) {
                 (function (menu) {
                     return function (err, arr) {
                         if (!err && arr && arr.length) {
-                            console.log('found menu ' + menu.modelName);
+                            console.log('done building ' + menu.modelName + ' menu');
                             req.app.locals.macondo.menus[menu.modelName] = arr;
+                            console.log(req.app.locals.macondo);
                             i += 1;
                             buildMenu(req, res, next);                            
                         } else {
