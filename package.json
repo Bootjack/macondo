@@ -12,7 +12,7 @@
   "dependencies": {
     "express": "~3.4.0",
     "jade": "~0.35.0",
-    "mongoose": "~3.6.15"
+    "mongoose": "~3.6.20"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

@@ -7,7 +7,7 @@
 module.exports = function (config) {
     'use strict';
     
-    var ModelFactory, models, menus, model, express, jade, path;
+    var ModelFactory, models, menus, model, express, jade, path, i;
     express = require('express');
     jade = require('jade');
     path = require('path');
@@ -103,10 +103,62 @@ module.exports = function (config) {
             );
         });
     }
+
+    function intercept(req, res, next) {
+        var id, match, name;
+        match = {
+            admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
+            delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
+            edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
+        };
+
+        if (match.admin && models.hasOwnProperty(match.admin[1])) {
+            id = match.admin[2];
+            name = match.admin[1].toLowerCase();
+            if ('POST' === req.method) {
+                if (id) {
+                    update(name, id, req.body, res);
+                } else {
+                    create(name, req.body, res);
+                }
+            } else if ('GET' === req.method && id) {
+                retrieve(name, id, res);
+            } else if (('PUT' === req.method) && id) {
+                update(name, id, res);
+            } else if ('DELETE' === req.method && id) {
+                destroy(name, id, res);
+            }
+        } else if (match.delete && models.hasOwnProperty(match.delete[1])) {
+            id = match.delete[2];
+            name = match.delete[1].toLowerCase();
+            destroy(name, id, res);
+        } else if (match.edit && models.hasOwnProperty(match.edit[1])) {
+            id = match.edit[2];
+            name = match.edit[1].toLowerCase();
+            form(name, id, res);
+        } else {
+            next();
+        }
+    }
+    
+    function buildMenu(req, res, next) {
+        if (i < menus.length) {
+            console.log('building ' + menus[i].modelName + ' menu');
+            console.log(menus[i].db);
+            menus[i].find({'isInMenu': true}, function (err, arr) {
+                console.log('error: ' + err);
+                console.log('found menu ' + menus[i].modelName);
+                req.app.locals.macondo.menus[menus[i].modelName] = arr;
+                i += 1;
+                buildMenu(req, res, next);
+            });
+        } else {
+            console.log('intercepting');
+            intercept(req, res, next);
+        }
+    }
     
     return function (req, res, next) {
-        var i = 0;
-
         console.log(req.path + ' handled by macondo');
 
         req.app.locals.macondo = {};
@@ -114,61 +166,10 @@ module.exports = function (config) {
         
         req.app.use(express.static(path.join(__dirname, 'assets')));
 
-        function intercept() {
-            var id, match, name;
-            match = {
-                admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
-                delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
-                edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
-            };
-            
-            if (match.admin && models.hasOwnProperty(match.admin[1])) {
-                id = match.admin[2];
-                name = match.admin[1].toLowerCase();
-                if ('POST' === req.method) {
-                    if (id) {
-                        update(name, id, req.body, res);
-                    } else {
-                        create(name, req.body, res);
-                    }
-                } else if ('GET' === req.method && id) {
-                    retrieve(name, id, res);
-                } else if (('PUT' === req.method) && id) {
-                    update(name, id, res);
-                } else if ('DELETE' === req.method && id) {
-                    destroy(name, id, res);
-                }
-            } else if (match.delete && models.hasOwnProperty(match.delete[1])) {
-                id = match.delete[2];
-                name = match.delete[1].toLowerCase();
-                destroy(name, id, res);
-            } else if (match.edit && models.hasOwnProperty(match.edit[1])) {
-                id = match.edit[2];
-                name = match.edit[1].toLowerCase();
-                form(name, id, res);
-            } else {
-                next();
-            }   
-        }
-        
-        function buildMenu() {
-            if (i < menus.length) {
-                console.log('building ' + menus[i].modelName + ' menu');
-                menus[i].find({'isInMenu': true}, function (err, arr) {
-                    console.log(err);
-                    console.log('found menu ' + menus[i].modelName);
-                    req.app.locals.macondo.menus[menus[i].modelName] = arr;
-                    i += 1;
-                    buildMenu();
-                });
-            } else {
-                console.log('intercepting');
-                intercept();
-            }
-        }
-        
+        i = 0;
+
         //intercept();
-        buildMenu();
+        buildMenu(req, res, next);
 
     };
 };
