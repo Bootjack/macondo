@@ -145,13 +145,17 @@ module.exports = function (config) {
         if (i < menus.length) {
             console.log('building ' + menus[i].modelName + ' menu');
             console.log(menus[i].db);
-            menus[i].find({'isInMenu': true}, function (err, arr) {
-                console.log('error: ' + err);
-                console.log('found menu ' + menus[i].modelName);
-                req.app.locals.macondo.menus[menus[i].modelName] = arr;
-                i += 1;
-                buildMenu(req, res, next);
-            });
+            menus[i].find({'isInMenu': true}, 
+                (function (menu) {
+                    return function (err, arr) {
+                        console.log('error: ' + err);
+                        console.log('found menu ' + menu.modelName);
+                        req.app.locals.macondo.menus[menu.modelName] = arr;
+                        i += 1;
+                        buildMenu(req, res, next);
+                    };
+                }(menus[i]))
+            );
         } else {
             console.log('intercepting');
             intercept(req, res, next);
