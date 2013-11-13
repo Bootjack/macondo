@@ -17,6 +17,7 @@ app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded());
 app.use(macondo({
+    app: app,
     models: {
         'page': {
             schema: null,

@@ -14,6 +14,10 @@ module.exports = function (config) {
     ModelFactory = require('./src/model');
     models = {};
     menus = [];
+    
+    if (config.app) {
+        config.app.use(express.static(path.join(__dirname, 'assets')));
+    }
 
     for (model in config.models) {
         if (config.models.hasOwnProperty(model)) {
@@ -144,15 +148,18 @@ module.exports = function (config) {
     function buildMenu(req, res, next) {
         if (i < menus.length) {
             console.log('building ' + menus[i].modelName + ' menu');
-            console.log(menus[i].db);
             menus[i].find({'isInMenu': true}, 
                 (function (menu) {
                     return function (err, arr) {
-                        console.log('error: ' + err);
-                        console.log('found menu ' + menu.modelName);
-                        req.app.locals.macondo.menus[menu.modelName] = arr;
-                        i += 1;
-                        buildMenu(req, res, next);
+                        if (!err && arr && arr.length) {
+                            console.log('found menu ' + menu.modelName);
+                            req.app.locals.macondo.menus[menu.modelName] = arr;
+                            i += 1;
+                            buildMenu(req, res, next);                            
+                        } else {
+                            console.log('error: ' + err);
+                            intercept(req, res, next);
+                        }
                     };
                 }(menus[i]))
             );
@@ -168,11 +175,7 @@ module.exports = function (config) {
         req.app.locals.macondo = {};
         req.app.locals.macondo.menus = {};
         
-        req.app.use(express.static(path.join(__dirname, 'assets')));
-
         i = 0;
-
-        //intercept();
         buildMenu(req, res, next);
 
     };
