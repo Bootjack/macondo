@@ -151,9 +151,25 @@ module.exports = function (config) {
             menus[i].find({'isInMenu': true}, 
                 (function (menu) {
                     return function (err, arr) {
+                        var a, item, keyed, nested;
+                        keyed = {};
+                        nested = [];
                         if (!err && arr && arr.length) {
                             console.log('done building ' + menu.modelName + ' menu');
-                            req.app.locals[menu.modelName + 'Menu'] = arr;
+                            for (a = 0; a < arr.length; a += 1) {
+                                item = arr[a];
+                                keyed[item._id] = item;
+                            }
+                            for (a = 0; a < arr.length; a += 1) {
+                                item = arr[a];
+                                if (item.menuParent) {
+                                    keyed[item.menuParent].children = keyed[item.menuParent].children || [];
+                                    keyed[item.menuParent].children.push(item);
+                                } else {
+                                    nested.push(item);
+                                }
+                            }
+                            req.app.locals[menu.modelName + 'Menu'] = nested;
                             i += 1;
                             buildMenu(req, res, next);                            
                         } else {
