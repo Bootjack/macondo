@@ -32,9 +32,9 @@ module.exports = function (config) {
     
     function normalize(modelName, data) {
         if ('page' === modelName) {
-            instance.path = instance.path.replace(/[\s_.]/, '-');
+            data.path = data.path.replace(/[\s_.]/g, '-');
         }
-        return instance;
+        return data;
     }
 
     function create(modelName, data, res) {
@@ -61,9 +61,13 @@ module.exports = function (config) {
                 for (property in data) {
                     if (data.hasOwnProperty(property)) {
                         instance[property] = data[property];
+                        console.log(property + ': ' + instance[property]);
                     }
                 }
                 instance.save(function(err, obj) {
+                    if (err) {
+                        console.log(err);
+                    }
                     res.send(200, JSON.stringify(obj));
                 });
             } else {
