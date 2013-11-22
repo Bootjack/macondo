@@ -7,7 +7,6 @@ mixin menu(arr)
                 if item.children
                     mixin menu(item.children)
 
-
 !!!5
 html
     head
@@ -15,5 +14,6 @@ html
             
     body
         h1 Macondo Example
-        h2 Page Menu
         mixin menu(pageMenu)
+
+        block body

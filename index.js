@@ -29,10 +29,17 @@ module.exports = function (config) {
             }
         }
     }
+    
+    function normalize(modelName, data) {
+        if ('page' === modelName) {
+            instance.path = instance.path.replace(/[\s_.]/, '-');
+        }
+        return instance;
+    }
 
     function create(modelName, data, res) {
         console.log('creating model');
-        var instance = new models[modelName](data);
+        var instance = new models[modelName](normalize(modelName, data));
         instance.save(function (err, obj) {
             res.send(200, JSON.stringify(obj));
         });
@@ -50,6 +57,7 @@ module.exports = function (config) {
         var property;
         models[modelName].findById(id, function (err, instance) {
             if (!err && instance) {
+                data = normalize(modelName, data);
                 for (property in data) {
                     if (data.hasOwnProperty(property)) {
                         instance[property] = data[property];
@@ -113,8 +121,11 @@ module.exports = function (config) {
         match = {
             admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
             delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
-            edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/)
+            edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/),
+            page: req.path.match(/^\/([^/]+)\/?$/)
         };
+        
+        console.log(match.page);
 
         if (match.admin && models.hasOwnProperty(match.admin[1])) {
             id = match.admin[2];
@@ -140,6 +151,14 @@ module.exports = function (config) {
             id = match.edit[2];
             name = match.edit[1].toLowerCase();
             form(name, id, res);
+        } else if (models.page && match.page && match.page[1]) {
+            models.page.find({path: match.page[1]}, function (err, page) {
+                if (err || 0 === page.length) {
+                    next();
+                } else {
+                    res.render('page', page[0]);
+                }
+            });
         } else {
             next();
         }
