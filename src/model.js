@@ -40,6 +40,7 @@ module.exports = function (name, schema) {
             }
         }
     }
+    mongoSchema._modelName = String;
     if (-1 === mongoose.modelNames().indexOf(name)) {
         Model = mongoose.model(name, mongoose.Schema(mongoSchema));
     } else {

@@ -1,0 +1,13 @@
+.manager(id="#{_id}")
+    p.manager--info
+        strong model: 
+        span.modelName #{_modelName}, 
+        strong id: 
+        span.id= _id
+    p.manager--links    
+        a.manager-new(href="/edit/#{_modelName}/new") New Page
+        |  
+        a.manager-edit(href="/edit/#{_modelName}/#{_id}") Edit
+        |  
+        a.manager-delete(href="/delete/#{_modelName}/#{_id}") Delete
+        

@@ -1,6 +1,8 @@
 extends layout
 
 block body
+    .pageManager!= managers.page(locals)
+    
     h2= title
     small= _id
     .body!= body

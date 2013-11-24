@@ -7,13 +7,16 @@
 module.exports = function (config) {
     'use strict';
     
-    var ModelFactory, models, menus, model, express, jade, path, i;
+    var ModelFactory, models, managers, menus, model, express, fs, jade, path, i;
     express = require('express');
+    fs = require('fs');
     jade = require('jade');
     path = require('path');
     ModelFactory = require('./src/model');
     models = {};
+    managers = {};
     menus = [];
+    var foo = "bar";
     
     if (config.app) {
         config.app.use(express.static(path.join(__dirname, 'assets')));
@@ -24,6 +27,7 @@ module.exports = function (config) {
             models[model] = new ModelFactory(
                 model, config.models[model].schema || require('./src/schemas/' + model)
             );
+            managers[model] = jade.compile(fs.readFileSync(path.join(__dirname, 'src/views/manager.jade')));
             if (config.models[model].hasMenu) {
                 menus.push(models[model]);
             }
@@ -40,6 +44,7 @@ module.exports = function (config) {
     function create(modelName, data, res) {
         console.log('creating model');
         var instance = new models[modelName](normalize(modelName, data));
+        instance._modelName = modelName;
         instance.save(function (err, obj) {
             res.send(200, JSON.stringify(obj));
         });
@@ -58,6 +63,7 @@ module.exports = function (config) {
         models[modelName].findById(id, function (err, instance) {
             if (!err && instance) {
                 data = normalize(modelName, data);
+                data._modelName = modelName;
                 for (property in data) {
                     if (data.hasOwnProperty(property)) {
                         instance[property] = data[property];
@@ -212,6 +218,8 @@ module.exports = function (config) {
         console.log(req.path + ' handled by macondo');
         
         i = 0;
+
+        req.app.locals.managers = managers;
         buildMenu(req, res, next);
 
     };
