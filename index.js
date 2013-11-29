@@ -96,33 +96,36 @@ module.exports = function (config) {
     
     function form(modelName, id, res) {
         var field, method;
-        models[modelName].findById(id, function (err, obj) {
-            if (obj) {
-                method = 'PUT';
-            } else {
-                obj = new models[modelName]();
-                for (field in models[modelName]._fields) {
-                    if (models[modelName]._fields.hasOwnProperty(field)) {
-                        obj[field] = models[modelName]._fields[field].default;
+        models[modelName].find({_id: {'$ne': id}, isInMenu: true}, 'title', function (err, siblings) {
+            models[modelName].findById(id, function (err, obj) {
+                if (obj) {
+                    method = 'PUT';
+                } else {
+                    obj = new models[modelName]();
+                    for (field in models[modelName]._fields) {
+                        if (models[modelName]._fields.hasOwnProperty(field)) {
+                            obj[field] = models[modelName]._fields[field].default;
+                        }
                     }
+                    method = 'POST';
                 }
-                method = 'POST';
-            }
-            jade.renderFile(
-                __dirname + '/src/views/form.jade', 
-                {
-                    method: method,
-                    model: models[modelName],
-                    instance: obj
-                },
-                function (err, html) {
-                    if (err) {
-                        res.send(500, err)
-                    } else {
-                        res.send(200, html);
+                jade.renderFile(
+                    __dirname + '/src/views/form.jade',
+                    {
+                        method: method,
+                        model: models[modelName],
+                        instance: obj,
+                        siblings: siblings
+                    },
+                    function (err, html) {
+                        if (err) {
+                            res.send(500, err)
+                        } else {
+                            res.send(200, html);
+                        }
                     }
-                }
-            );
+                );
+            });
         });
     }
 
@@ -134,8 +137,6 @@ module.exports = function (config) {
             edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/),
             page: req.path.match(/^\/([^/]+)\/?$/)
         };
-        
-        console.log(match.page);
 
         if (match.admin && models.hasOwnProperty(match.admin[1])) {
             id = match.admin[2];
@@ -176,7 +177,6 @@ module.exports = function (config) {
     
     function buildMenu(req, res, next) {
         if (i < menus.length) {
-            console.log('building ' + menus[i].modelName + ' menu');
             menus[i].find({'isInMenu': true}, 
                 (function (menu) {
                     return function (err, arr) {
@@ -184,14 +184,13 @@ module.exports = function (config) {
                         keyed = {};
                         nested = [];
                         if (!err && arr && arr.length) {
-                            console.log('done building ' + menu.modelName + ' menu');
                             for (a = 0; a < arr.length; a += 1) {
                                 item = arr[a];
                                 keyed[item._id] = item;
                             }
                             for (a = 0; a < arr.length; a += 1) {
                                 item = arr[a];
-                                if (item.menuParent) {
+                                if (item.menuParent && keyed[item.menuParent]) {
                                     keyed[item.menuParent].children = keyed[item.menuParent].children || [];
                                     keyed[item.menuParent].children.push(item);
                                 } else {
@@ -209,7 +208,6 @@ module.exports = function (config) {
                 }(menus[i]))
             );
         } else {
-            console.log('intercepting');
             intercept(req, res, next);
         }
     }

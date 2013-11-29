@@ -1,11 +1,18 @@
 link(rel="stylesheet", type="text/css", href="/macondo.css")
-link(rel="stylesheet", type="text/css", href="/datepickr.css")
+link(rel="stylesheet", type="text/css", href="/datepickr/datepickr.css")
 
 form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id || ''}", method="POST")
     fieldset
         legend= model._name
         each field, name in model._fields
-            if (!field.private)
+            if ('menuParent' === name && 'text' === field.name)
+                label Menu Parent
+                select(name="menuParent")
+                    option(value="") [None]
+                    each sibling in siblings
+                        option(value="#{sibling._id}", selected=(instance.menuParent == sibling._id) ? "selected" : false)!= sibling.title
+            
+            else if (!field.private)
                 label= name.replace(/([A-Z])/g, ' $1')
                 case field.name
                     when 'boolean'
@@ -19,16 +26,15 @@ form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id
                         input.datepickr(id="#{model._name}-edit-form--#{name}", name="#{name}", type="text", value="#{instance[name]}")
                     when 'html'
                         textarea.tinymce(name="#{name}")= instance[name]   
-    input(type="button", value="Delete", onclick="(function () {var form = document.getElementById('#{model._name}-edit-form'); form.method='DELETE'; form.submit();}())")
-    input(type="submit", value="Save")
 
-script(src="//tinymce.cachefly.net/4.0/tinymce.min.js", type="text/javascript")
+    input.save-button(type="submit", value="Save")
+    input.cancel-button(type="button", value="Cancel")
+
 script(type="text/javascript").
     tinymce.init({
         selector: ".tinymce",
      });
-
-script(src="/datepickr.js", type="text/javascript")
+     
 script(type="text/javascript").
     (function() {
         var i, buttons, classes;

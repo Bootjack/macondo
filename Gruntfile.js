@@ -1,6 +1,17 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        copy: {
+            main: {
+                files: [
+                    {expand: true, flatten: true, cwd: 'bower_components/jquery', src: ['jquery.min.js'], dest: 'assets/'},
+                    {expand: true, flatten: true, cwd: 'bower_components/zepto', src: ['zepto.min.js'], dest: 'assets/'},
+                    {expand: true, flatten: true, cwd: 'bower_components', src: ['datepickr/datepickr.css'], dest: 'assets/'},
+                    {expand: true, flatten: true, cwd: 'bower_components', src: ['datepickr/datepickr.js'], dest: 'assets/'},
+                    {expand: true, flatten: false, cwd: 'bower_components/tinymce/js/', src: ['tinymce/**'], dest: 'assets/'}
+                ]
+            }
+        },
         jasmine: {
             pivotal: {
                 src: 'src/**/*.js',
@@ -12,7 +23,8 @@ module.exports = function (grunt) {
         }
     });
     
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
-
-    grunt.registerTask('default', ['jasmine']);
+    
+    grunt.registerTask('default', ['copy']);
 };
