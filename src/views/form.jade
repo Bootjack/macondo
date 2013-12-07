@@ -7,11 +7,11 @@ form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id
         each field, name in model._fields
             if ('menuParent' === name && 'text' === field.name)
                 label Menu Parent
-                select(name="menuParent")
-                    option(value="") [None]
-                    each sibling in siblings
-                        option(value="#{sibling._id}", selected=(instance.menuParent == sibling._id) ? "selected" : false)!= sibling.title
-            
+                    select(name="menuParent")
+                        option(value="") [None]
+                        each sibling in siblings
+                            option(value="#{sibling._id}", selected=(instance.menuParent == sibling._id) ? "selected" : false)!= sibling.title
+                
             else if (!field.private)
                 label= name.replace(/([A-Z])/g, ' $1')
                     case field.name
