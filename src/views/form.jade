@@ -14,18 +14,18 @@ form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id
             
             else if (!field.private)
                 label= name.replace(/([A-Z])/g, ' $1')
-                case field.name
-                    when 'boolean'
-                        input(type="checkbox", name="#{name}", value="true", checked=(instance[name] ? 'checked' : null))
-                    when 'text'
-                        input(type="text", name="#{name}", value="#{instance[name]}")
-                    when 'number'
-                        input(type="text", name="#{name}", size="6", value="#{instance[name]}")
-                    when 'date'
-                        //input(type="hidden", name="#{name}", value="#{instance[name]}")
-                        input.datepickr(id="#{model._name}-edit-form--#{name}", name="#{name}", type="text", value="#{instance[name]}")
-                    when 'html'
-                        textarea.tinymce(name="#{name}")= instance[name]   
+                    case field.name
+                        when 'boolean'
+                            input(type="checkbox", name="#{name}", value="true", checked=(instance[name] ? 'checked' : null))
+                        when 'text'
+                            input(type="text", name="#{name}", value="#{instance[name]}")
+                        when 'number'
+                            input(type="text", name="#{name}", size="6", value="#{instance[name]}")
+                        when 'date'
+                            //input(type="hidden", name="#{name}", value="#{instance[name]}")
+                            input.datepickr(id="#{model._name}-edit-form--#{name}", name="#{name}", type="text", value="#{instance[name]}")
+                        when 'html'
+                            textarea.tinymce(name="#{name}")= instance[name]   
 
     input.save-button(type="submit", value="Save")
     input.cancel-button(type="button", value="Cancel")
