@@ -1,5 +1,5 @@
 link(rel="stylesheet", type="text/css", href="/macondo.css")
-link(rel="stylesheet", type="text/css", href="/datepickr/datepickr.css")
+link(rel="stylesheet", type="text/css", href="/datepickr.css")
 
 form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id || ''}", method="POST")
     fieldset
@@ -30,9 +30,12 @@ form(id="#{model._name}-edit-form", action="/admin/#{model._name}/#{instance._id
     input.save-button(type="submit", value="Save")
     input.cancel-button(type="button", value="Cancel")
 
+script(src="/datepickr/datepickr.js", type="text/javascript")
+script(src="/tinymce/tinymce.min.js", type="text/javascript")
+
 script(type="text/javascript").
     tinymce.init({
         selector: ".tinymce",
      });
-     
+
 script(type="text/javascript", src="macondo/form-controller.js")
