@@ -4,7 +4,7 @@ module.exports = function (grunt) {
         copy: {
             main: {
                 files: [
-                    {expand: true, flatten: true, cwd: 'src/client', src: ['form-controller.js'], dest: 'assets/macondo.js'},
+                    {expand: true, flatten: true, cwd: 'src/client', src: ['form-controller.js'], dest: 'assets/macondo/'},
                     {expand: true, flatten: true, cwd: 'bower_components/jquery', src: ['jquery.min.js'], dest: 'assets/'},
                     {expand: true, flatten: true, cwd: 'bower_components/zepto', src: ['zepto.min.js'], dest: 'assets/'},
                     {expand: true, flatten: true, cwd: 'bower_components', src: ['datepickr/datepickr.css'], dest: 'assets/'},
