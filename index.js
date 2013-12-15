@@ -7,10 +7,11 @@
 module.exports = function (config) {
     'use strict';
     
-    var ModelFactory, models, managers, menus, model, express, fs, jade, path, i;
+    var ModelFactory, models, managers, menus, model, mongoose, express, fs, jade, path, i;
     express = require('express');
     fs = require('fs');
     jade = require('jade');
+    mongoose = require('mongoose');
     path = require('path');
     ModelFactory = require('./src/model');
     models = {};
@@ -95,10 +96,18 @@ module.exports = function (config) {
     }
     
     function form(modelName, id, res) {
-        var field, method;
-        models[modelName].find({_id: {'$ne': id}, isInMenu: true}, 'title', function (err, siblings) {
+        var field, match, method;
+        match = {isInMenu: true};
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+           match._id = {'$ne': id};
+        }
+        models[modelName].find(match, 'title', function (err, siblings) {
+            if (err) {
+                console.log(err)
+            }
             models[modelName].findById(id, function (err, obj) {
                 if (obj) {
+                    console.log(obj);
                     method = 'PUT';
                 } else {
                     obj = new models[modelName]();
@@ -201,7 +210,9 @@ module.exports = function (config) {
                             i += 1;
                             buildMenu(req, res, next);                            
                         } else {
-                            console.log('error: ' + err);
+                            if (err) {
+                                console.log(err);
+                            }
                             intercept(req, res, next);
                         }
                     };
