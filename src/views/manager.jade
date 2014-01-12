@@ -5,7 +5,7 @@
         strong id: 
         span.id= _id
     p.manager--links    
-        a.manager--links--new(href="/edit/#{_modelName}/new") New Page
+        a.manager--links--new(href="/edit/#{_modelName}/new") New #{_modelName}
         |  
         a.manager--links--edit(href="/edit/#{_modelName}/#{_id}") Edit
         |  
@@ -14,7 +14,7 @@
     script(type="text/javascript").
         if ('undefined' === typeof jQuery) {
             document.write('<script src=' +
-            ('__proto__' in {} ? 'zepto' : 'jquery') +
+            ('__proto__' in {} ? '/zepto' : '/jquery') +
             '.min.js><\/script>')
         }
         
