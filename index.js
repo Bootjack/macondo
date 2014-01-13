@@ -186,7 +186,7 @@ module.exports = function (config) {
     
     function buildMenu(req, res, next) {
         if (i < menus.length) {
-            menus[i].find({'isInMenu': true}, {sort: 'menuOrder title'},
+            menus[i].find({'isInMenu': true}, null, {sort: ['menuOrder', 'title']},
                 (function (menu) {
                     return function (err, arr) {
                         var a, item, keyed, nested;
