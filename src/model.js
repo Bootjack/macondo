@@ -19,24 +19,49 @@ module.exports = function (name, schema) {
         if (schema.hasOwnProperty(property) && schema[property].type) {
             fields[property] = {};
             fields[property].name = dataTypes[schema[property].type].name;
-            fields[property].default = dataTypes[schema[property].type].default;
+            fields[property].default = schema[property].default || dataTypes[schema[property].type].default;
             fields[property].private = schema[property].private;
-            switch(schema[property].type) {
-                case 'boolean':
-                    mongoSchema[property] = Boolean;
-                    break;
-                case 'text':
-                case 'html':
-                    mongoSchema[property] = String;
-                    break;
-                case 'number':
-                    mongoSchema[property] = Number;
-                    break;
-                case 'date':
-                    mongoSchema[property] = Date;
-                    break;
-                default:
-                    mongoSchema[property] = Object;
+            if (schema[property].array) {
+                fields[property].array = true;
+                fields[property].default = [fields[property].default];
+
+                switch(schema[property].type) {
+                    case 'boolean':
+                        mongoSchema[property] = [Boolean];
+                        break;
+                    case 'text':
+                    case 'html':
+                        console.log(property + ' is an array of Strings');
+                        mongoSchema[property] = [String];
+                        break;
+                    case 'number':
+                        mongoSchema[property] = [Number];
+                        break;
+                    case 'date':
+                        mongoSchema[property] = [Date];
+                        break;
+                    default:
+                        mongoSchema[property] = [Object];
+                }
+            } else {
+                switch(schema[property].type) {
+                    case 'boolean':
+                        mongoSchema[property] = Boolean;
+                        break;
+                    case 'text':
+                    case 'html':
+                        console.log(property + ' is a String');
+                        mongoSchema[property] = String;
+                        break;
+                    case 'number':
+                        mongoSchema[property] = Number;
+                        break;
+                    case 'date':
+                        mongoSchema[property] = Date;
+                        break;
+                    default:
+                        mongoSchema[property] = Object;
+                }
             }
         }
     }

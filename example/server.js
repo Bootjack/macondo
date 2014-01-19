@@ -21,6 +21,14 @@ app.use(macondo({
     models: {
         'page': {
             schema: null,
+            keys: {
+                regions: [
+                    'Main',
+                    'Sidebar',
+                    'Header',
+                    'Footer'
+                ]
+            },
             hasMenu: true
         },
         'production' : {

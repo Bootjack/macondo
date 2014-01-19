@@ -1,3 +1,16 @@
+mixin formField(field, name, value, modelName)
+    case field.name
+        when 'boolean'
+            input(type="checkbox", name="#{name}", value="true", checked=(value ? 'checked' : null))
+        when 'text'
+            input(type="text", name="#{name}", value="#{value}")
+        when 'number'
+            input(type="text", name="#{name}", size="6", value="#{value}")
+        when 'date'
+            input.datepickr(id="#{modelName}-edit-form--#{name}", name="#{name}", type="text", value="#{value}")
+        when 'html'
+            textarea.tinymce(name="#{name}")= value
+
 link(rel="stylesheet", type="text/css", href="/macondo.css")
 link(rel="stylesheet", type="text/css", href="/datepickr.css")
 
@@ -11,28 +24,29 @@ form.macondo-edit-form(id="#{model._name}-edit-form", action="/admin/#{model._na
                         option(value="") [None]
                         each sibling in siblings
                             option(value="#{sibling._id}", selected=(instance.menuParent == sibling._id) ? "selected" : false)!= sibling.title
-                
+
             else if (!field.private)
                 label(class="macondo-type--#{field.name} macondo-property--#{name}")= name.replace(/([A-Z])/g, ' $1')
-                    case field.name
-                        when 'boolean'
-                            input(type="checkbox", name="#{name}", value="true", checked=(instance[name] ? 'checked' : null))
-                        when 'text'
-                            input(type="text", name="#{name}", value="#{instance[name]}")
-                        when 'number'
-                            input(type="text", name="#{name}", size="6", value="#{instance[name]}")
-                        when 'date'
-                            //input(type="hidden", name="#{name}", value="#{instance[name]}")
-                            input.datepickr(id="#{model._name}-edit-form--#{name}", name="#{name}", type="text", value="#{instance[name]}")
-                        when 'html'
-                            textarea.tinymce(name="#{name}")= instance[name]   
+                    if (field.array)
+                        if (model._keys[name])
+                            for key, index in model._keys[name]
+                                h3= key
+                                mixin formField(field, name + '[' + index + ']', instance[name][index], model._name)
+                        else
+                            for value, index in instance[name]
+                                mixin formField(field, name + '[' + index + ']', value, model._name)
+                    else
+                        mixin formField(field, name, instance[name], model._name)
 
     input.save-button(type="submit", value="Save")
     input.cancel-button(type="button", value="Cancel")
 
 script(type="text/javascript").
     tinymce.init({
-        selector: ".tinymce",
+        selector: '.tinymce',
+        plugins: 'link media textcolor searchreplace visualblocks visualchars code image',
+        toolbar1: "undo redo | link blockquote image media | bold italic underline forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
+        visual: false
      });
 
     (function() {

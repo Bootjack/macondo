@@ -28,6 +28,7 @@ module.exports = function (config) {
             models[model] = new ModelFactory(
                 model, config.models[model].schema || require('./src/schemas/' + model)
             );
+            models[model]._keys = config.models[model].keys;
             managers[model] = jade.compile(fs.readFileSync(path.join(__dirname, 'src/views/manager.jade')));
             if (config.models[model].hasMenu) {
                 menus.push(models[model]);
@@ -62,15 +63,17 @@ module.exports = function (config) {
         console.log('updating model');
         var property;
         models[modelName].findById(id, function (err, instance) {
+            var array, i, value;
             if (!err && instance) {
                 data = normalize(modelName, data);
                 data._modelName = modelName;
                 for (property in data) {
                     if (data.hasOwnProperty(property)) {
-                        instance[property] = data[property];
                         console.log(property + ': ' + instance[property]);
+                        instance[property] = data[property];
                     }
                 }
+                console.log(instance);
                 instance.save(function(err, obj) {
                     if (err) {
                         console.log(err);

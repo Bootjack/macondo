@@ -8,8 +8,8 @@ module.exports = {
     menuParent: {type: 'text'},
     path: {type: 'text'},
     template: {type: 'text'},
-    regions: {type: 'text'},
     title: {type: 'text'},
     author: {type: 'text'},
-    body: {type: 'html'}
+    body: {type: 'html'},
+    regions: {type: 'html', array: true}
 };
