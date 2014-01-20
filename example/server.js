@@ -34,7 +34,8 @@ app.use(macondo({
         'production' : {
             schema: {
                 title: {type: 'text'},
-                playwright: {type: 'text'}
+                playwright: {type: 'text'},
+                actors: {type: 'text', array: true}
             }
         }
     }

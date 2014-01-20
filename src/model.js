@@ -31,7 +31,6 @@ module.exports = function (name, schema) {
                         break;
                     case 'text':
                     case 'html':
-                        console.log(property + ' is an array of Strings');
                         mongoSchema[property] = [String];
                         break;
                     case 'number':
@@ -50,7 +49,6 @@ module.exports = function (name, schema) {
                         break;
                     case 'text':
                     case 'html':
-                        console.log(property + ' is a String');
                         mongoSchema[property] = String;
                         break;
                     case 'number':

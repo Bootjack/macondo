@@ -17,10 +17,9 @@ module.exports = function (config) {
     models = {};
     managers = {};
     menus = [];
-    var foo = "bar";
     
     if (config.app) {
-        config.app.use(express.static(path.join(__dirname, 'assets')));
+        config.app.use(express.static(path.join(__dirname, 'assets')));  
     }
 
     for (model in config.models) {
@@ -232,7 +231,8 @@ module.exports = function (config) {
         i = 0;
 
         req.app.locals.managers = managers;
-        buildMenu(req, res, next);
+        res.locals.models = models;
 
+        buildMenu(req, res, next);
     };
 };
