@@ -31,11 +31,7 @@ form.macondo-edit-form(id="#{model._name}-edit-form", action="/admin/#{model._na
                         if (model._keys[name])
                             for key, index in model._keys[name]
                                 h3= key
-                                if instance[name].length > index
-                                    mixin formField(field, name + '[' + index + ']', instance[name][index], model._name)
-                                else
-                                    mixin formField(field, name + '[' + index + ']', "", model._name)
-
+                                mixin formField(field, name + '[' + index + ']', instance[name][index], model._name)
                         else
                             for value, index in instance[name]
                                 mixin formField(field, name + '[' + index + ']', value, model._name)
