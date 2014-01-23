@@ -24,11 +24,11 @@ form.macondo-edit-form(id="#{model._name}-edit-form", action="/admin/#{model._na
                         option(value="") [None]
                         each sibling in siblings
                             option(value="#{sibling._id}", selected=(instance.menuParent == sibling._id) ? "selected" : false)!= sibling.title
-
+            
             else if (!field.private)
                 label(class="macondo-type--#{field.name} macondo-property--#{name}")= name.replace(/([A-Z])/g, ' $1')
                     if (field.array)
-                        if (model._keys[name])
+                        if (model._keys && model._keys[name])
                             for key, index in model._keys[name]
                                 h3= key
                                 mixin formField(field, name + '[' + index + ']', instance[name][index], model._name)
@@ -36,7 +36,7 @@ form.macondo-edit-form(id="#{model._name}-edit-form", action="/admin/#{model._na
                             for value, index in instance[name]
                                 mixin formField(field, name + '[' + index + ']', value, model._name)
                     
-                    else if (model._presets[name])
+                    else if (model._presets && model._presets[name])
                         select(name="#{name}")
                             for value in model._presets[name]
                                 option(value="#{value}", selected=(value === instance[name] ? "selected" : null))= value

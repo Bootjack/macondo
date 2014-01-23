@@ -1,13 +1,10 @@
 mixin menu(arr)
-    ul
+    each item in arr
         li
-            a(href="/") Home
-        each item in arr
-            li
-                -var url = item.path && item.path.replace(/^\/?/, '/').replace(/\s+/g, '-');
-                a(href="#{url}", title="#{item._id}")!= item.title
-                if item.children
-                    mixin menu(item.children)
+            -var url = item.path && item.path.replace(/^\/?/, '/').replace(/\s+/g, '-');
+            a(href="#{url}", title="#{item._id}")!= item.title
+            if item.children
+                mixin menu(item.children)
 
 !!!5
 html
@@ -16,6 +13,10 @@ html
             
     body
         h1 Macondo Example
-        mixin menu(pageMenu)
+        nav
+            ul
+                li
+                    a(href="/") Home
+                mixin menu(pageMenu)
 
         block body

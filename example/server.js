@@ -7,7 +7,7 @@ macondo = require('../index.js');
 mongoose = require('mongoose');
 path = require('path');
 
-mongoose.connect('localhost/macondo');
+mongoose.connect('localhost/cctc');
 
 app = new express();
 app.set('port', 3300);
@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded());
 app.use(macondo({
     app: app,
-    options: {},
+
     models: {
         'page': {
             schema: null,
@@ -28,12 +28,6 @@ app.use(macondo({
                     'Sidebar',
                     'Header',
                     'Footer'
-                ]
-            },
-            presets: {
-                template: [
-                    'page',
-                    'alternate'
                 ]
             },
             hasMenu: true

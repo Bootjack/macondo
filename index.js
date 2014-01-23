@@ -42,7 +42,7 @@ module.exports = function (config) {
         }
         return data;
     }
-
+    
     function create(modelName, data, res) {
         console.log('creating model');
         var instance = new models[modelName](normalize(modelName, data));
@@ -58,7 +58,7 @@ module.exports = function (config) {
             res.send(200, JSON.stringify(obj));        
         });
     }
-
+    
     function update(modelName, id, data, res) {
         console.log('updating model');
         var property;
