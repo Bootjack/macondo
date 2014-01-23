@@ -130,7 +130,7 @@ module.exports = function (config) {
                     },
                     function (err, html) {
                         if (err) {
-                            res.send(500, html)
+                            res.send(500, 'Jade rendering error: ' + err)
                         } else {
                             res.send(200, html);
                         }
