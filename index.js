@@ -28,6 +28,7 @@ module.exports = function (config) {
                 model, config.models[model].schema || require('./src/schemas/' + model)
             );
             models[model]._keys = config.models[model].keys;
+            models[model]._presets = config.models[model].presets;
             managers[model] = jade.compile(fs.readFileSync(path.join(__dirname, 'src/views/manager.jade')));
             if (config.models[model].hasMenu) {
                 menus.push(models[model]);
@@ -175,10 +176,13 @@ module.exports = function (config) {
             form(name, id, res);
         } else if (models.page && match.page && match.page[1]) {
             models.page.find({path: match.page[1]}, function (err, page) {
+                var template;
                 if (err || 0 === page.length) {
                     next();
                 } else {
-                    res.render('page', page[0]);
+                    template = page[0].template.toString() || 'page';
+                    console.log('rendering page with "' +  template + '" template');
+                    res.render(template, page[0]);
                 }
             });
         } else {
@@ -210,7 +214,7 @@ module.exports = function (config) {
                             }
                             req.app.locals[menu.modelName + 'Menu'] = nested;
                             i += 1;
-                            buildMenu(req, res, next);                            
+                            buildMenu(req, res, next);
                         } else {
                             if (err) {
                                 console.log(err);
