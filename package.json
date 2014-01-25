@@ -1,6 +1,6 @@
 {
   "name": "macondo",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A CMS with Express and Mongoose",
   "main": "index.js",
   "scripts": {

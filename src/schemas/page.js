@@ -10,6 +10,5 @@ module.exports = {
     template: {type: 'text'},
     title: {type: 'text'},
     author: {type: 'text'},
-    body: {type: 'html'},
     regions: {type: 'html', array: true}
 };
