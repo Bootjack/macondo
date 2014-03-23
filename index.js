@@ -19,7 +19,8 @@ module.exports = function (config) {
     menus = [];
     
     if (config.app) {
-        config.app.use(express.static(path.join(__dirname, 'assets')));  
+        config.app.use(express.static(path.join(__dirname, 'assets')));
+        config.app.use(express.static(path.join(config.app.get('filepath'), 'macondo_cache')));
     }
 
     for (model in config.models) {
@@ -43,11 +44,36 @@ module.exports = function (config) {
         return data;
     }
     
+    function saveCacheFile(instance, res) {
+        // Save rendered jade template to filesystem as HTML
+        var cachePath, template;
+
+        buildMenu(function () {
+            instance._isCache = true;
+            template = instance.template.toString() || 'page';
+            cachePath = path.join(config.app.get('filepath'), 'macondo_cache', instance.path + '.html');
+            res.render(template, instance, function(err, html) {
+                fs.writeFile(cachePath, html, 'utf-8', function(err) {
+                    console.log('saved cached page ' + instance.path );
+                });
+            });            
+        });
+    }
+
+    function deleteCacheFile(instance, res) {
+        // Delete cached HTML from filesystem
+        var cachePath = path.join(config.app.get('filepath'), 'macondo_cache', instance.path + '.html');
+        fs.unlink(cachePath, function (err) {
+            console.log('cleared cached page ' + instance.path);
+        });
+    }
+    
     function create(modelName, data, res) {
         console.log('creating model');
         var instance = new models[modelName](normalize(modelName, data));
         instance._modelName = modelName;
         instance.save(function (err, obj) {
+            saveCacheFile(obj, res);
             res.send(200, JSON.stringify(obj));
         });
     }
@@ -78,6 +104,7 @@ module.exports = function (config) {
                     if (err) {
                         console.log(err);
                     }
+                    saveCacheFile(obj, res);
                     res.send(200, JSON.stringify(obj));
                 });
             } else {
@@ -90,6 +117,7 @@ module.exports = function (config) {
         console.log('destroying model');
         models[modelName].findById(id, function (err, obj) {
             if (!err && obj) {
+                deleteCacheFile(obj, res);
                 obj.remove();
                 res.send(200, modelName + ' ' + id + ' destroyed');
             } else {
@@ -189,7 +217,7 @@ module.exports = function (config) {
         }
     }
     
-    function buildMenu(req, res, next) {
+    function buildMenu(callback) {
         if (i < menus.length) {
             menus[i].find({'isInMenu': true}, null, {sort: ['menuOrder', 'title']},
                 (function (menu) {
@@ -211,20 +239,19 @@ module.exports = function (config) {
                                     nested.push(item);
                                 }
                             }
-                            req.app.locals[menu.modelName + 'Menu'] = nested;
+                            config.app.locals[menu.modelName + 'Menu'] = nested;
                             i += 1;
-                            buildMenu(req, res, next);
+                            buildMenu(callback);
                         } else {
                             if (err) {
                                 console.log(err);
                             }
-                            intercept(req, res, next);
                         }
                     };
                 }(menus[i]))
             );
-        } else {
-            intercept(req, res, next);
+        } else if ('function' === typeof callback) {
+            callback();
         }
     }
     
@@ -236,6 +263,8 @@ module.exports = function (config) {
         req.app.locals.managers = managers;
         res.locals.models = models;
 
-        buildMenu(req, res, next);
+        buildMenu(function () {
+            intercept(req, res, next);
+        });
     };
 };

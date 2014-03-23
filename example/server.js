@@ -7,10 +7,11 @@ macondo = require('../index.js');
 mongoose = require('mongoose');
 path = require('path');
 
-mongoose.connect('localhost/cctc');
+mongoose.connect('localhost/macondo');
 
 app = new express();
 app.set('port', 3300);
+app.set('filepath', __dirname);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 
