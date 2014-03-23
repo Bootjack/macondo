@@ -17,10 +17,12 @@ module.exports = function (config) {
     models = {};
     managers = {};
     menus = [];
-    
+
     if (config.app) {
         config.app.use(express.static(path.join(__dirname, 'assets')));
         config.app.use(express.static(path.join(config.app.get('filepath'), 'macondo_cache')));
+        config.app.locals.managers = managers;
+        config.app.locals.models = models;
     }
 
     for (model in config.models) {
@@ -36,6 +38,17 @@ module.exports = function (config) {
             }
         }
     }
+
+    if (models.page) {
+        models.page.find({}, function(err, pages) {
+            var i = 0;
+            if (!err) {
+                for (i = 0; i < pages.length; i += 1) {
+                    saveCacheFile(pages[i]);
+                }
+            }
+        })
+    }
     
     function normalize(modelName, data) {
         if ('page' === modelName) {
@@ -44,7 +57,7 @@ module.exports = function (config) {
         return data;
     }
     
-    function saveCacheFile(instance, res) {
+    function saveCacheFile(instance) {
         // Save rendered jade template to filesystem as HTML
         var cachePath, template;
 
@@ -53,7 +66,8 @@ module.exports = function (config) {
             instance._isCache = true;
             template = instance.template.toString() || 'page';
             cachePath = path.join(config.app.get('filepath'), 'macondo_cache', instance.path + '.html');
-            res.render(template, instance, function(err, html) {
+            config.app.render(template, instance, function(err, html) {
+                console.log(err || html);
                 fs.writeFile(cachePath, html, 'utf-8', function(err) {
                     console.log('saved cached page ' + instance.path );
                 });
