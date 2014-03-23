@@ -48,6 +48,7 @@ module.exports = function (config) {
         // Save rendered jade template to filesystem as HTML
         var cachePath, template;
 
+        i = 0;
         buildMenu(function () {
             instance._isCache = true;
             template = instance.template.toString() || 'page';

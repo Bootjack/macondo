@@ -1,7 +1,7 @@
 mixin menu(arr)
     each item in arr
         li
-            -var url = item.path && item.path.replace(/^\/?/, '/').replace(/\s+/g, '-');
+            -var url = item.path && item.path.replace(/^\/?/, '/').replace(/\s+/g, '-') + '.html';
             a(href="#{url}", title="#{item._id}")!= item.title
             if item.children
                 mixin menu(item.children)
