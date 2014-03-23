@@ -6,8 +6,8 @@
 
 module.exports = function (config) {
     'use strict';
-    
-    var ModelFactory, models, managers, menus, model, mongoose, express, fs, jade, path, i;
+
+    var ModelFactory, models, managers, menus, model, mongoose, express, fs, jade, path, cachePath, i;
     express = require('express');
     fs = require('fs');
     jade = require('jade');
@@ -19,8 +19,12 @@ module.exports = function (config) {
     menus = [];
 
     if (config.app) {
+        cachePath = path.join(path.dirname(require.main.filename), 'macondo_cache');
+
+        fs.mkdir(cachePath, function (err) {});
+        config.app.use(express.static(cachePath));
+
         config.app.use(express.static(path.join(__dirname, 'assets')));
-        config.app.use(express.static(path.join(config.app.get('filepath'), 'macondo_cache')));
         config.app.locals.managers = managers;
         config.app.locals.models = models;
     }
@@ -49,40 +53,39 @@ module.exports = function (config) {
             }
         })
     }
-    
+
     function normalize(modelName, data) {
         if ('page' === modelName) {
             data.path = data.path.replace(/[\s_.]/g, '-');
         }
         return data;
     }
-    
+
     function saveCacheFile(instance) {
         // Save rendered jade template to filesystem as HTML
-        var cachePath, template;
+        var cacheFilePath, template;
 
         i = 0;
         buildMenu(function () {
             instance._isCache = true;
             template = instance.template.toString() || 'page';
-            cachePath = path.join(config.app.get('filepath'), 'macondo_cache', instance.path + '.html');
+            cacheFilePath = path.join(cachePath, instance.path + '.html');
             config.app.render(template, instance, function(err, html) {
-                console.log(err || html);
-                fs.writeFile(cachePath, html, 'utf-8', function(err) {
+                fs.writeFile(cacheFilePath, html, 'utf-8', function(err) {
                     console.log('saved cached page ' + instance.path );
                 });
-            });            
+            });
         });
     }
 
     function deleteCacheFile(instance, res) {
         // Delete cached HTML from filesystem
-        var cachePath = path.join(config.app.get('filepath'), 'macondo_cache', instance.path + '.html');
-        fs.unlink(cachePath, function (err) {
+        var cacheFilePath = path.join(cachePath, instance.path + '.html');
+        fs.unlink(cacheFilePath, function (err) {
             console.log('cleared cached page ' + instance.path);
         });
     }
-    
+
     function create(modelName, data, res) {
         console.log('creating model');
         var instance = new models[modelName](normalize(modelName, data));
@@ -92,14 +95,14 @@ module.exports = function (config) {
             res.send(200, JSON.stringify(obj));
         });
     }
-    
+
     function retrieve(modelName, id, res) {
         console.log('retrieving model');
         models[modelName].findById(id, function(err, obj) {
-            res.send(200, JSON.stringify(obj));        
+            res.send(200, JSON.stringify(obj));
         });
     }
-    
+
     function update(modelName, id, data, res) {
         console.log('updating model');
         var property;
@@ -127,7 +130,7 @@ module.exports = function (config) {
             }
         });
     }
-    
+
     function destroy(modelName, id, res) {
         console.log('destroying model');
         models[modelName].findById(id, function (err, obj) {
@@ -140,12 +143,12 @@ module.exports = function (config) {
             }
         });
     }
-    
+
     function form(modelName, id, res) {
         var field, match, method;
         match = {isInMenu: true};
         if (id.match(/^[0-9a-fA-F]{24}$/)) {
-           match._id = {'$ne': id};
+            match._id = {'$ne': id};
         }
         models[modelName].find(match, 'title', function (err, siblings) {
             if (err) {
@@ -231,7 +234,7 @@ module.exports = function (config) {
             next();
         }
     }
-    
+
     function buildMenu(callback) {
         if (i < menus.length) {
             menus[i].find({'isInMenu': true}, null, {sort: ['menuOrder', 'title']},
@@ -269,10 +272,10 @@ module.exports = function (config) {
             callback();
         }
     }
-    
+
     return function (req, res, next) {
         console.log(req.path + ' handled by macondo');
-        
+
         i = 0;
 
         req.app.locals.managers = managers;
