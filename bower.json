@@ -1,7 +1,7 @@
 {
   "name": "macondo",
   "main": "index.js",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "homepage": "https://github.com/Bootjack/macondo",
   "description": "Description",
   "authors": [
