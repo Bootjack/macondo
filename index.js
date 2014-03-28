@@ -258,13 +258,13 @@ module.exports = function (config) {
                                 }
                             }
                             config.app.locals[menu.modelName + 'Menu'] = nested;
-                            i += 1;
-                            buildMenu(callback);
                         } else {
                             if (err) {
                                 console.log(err);
                             }
                         }
+                        i += 1;
+                        buildMenu(callback);
                     };
                 }(menus[i]))
             );
