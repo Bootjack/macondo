@@ -66,16 +66,18 @@ module.exports = function (config) {
         var cacheFilePath, template;
 
         i = 0;
-        buildMenu(function () {
-            instance._isCache = true;
-            template = instance.template.toString() || 'page';
-            cacheFilePath = path.join(cachePath, instance.path + '.html');
-            config.app.render(template, instance, function(err, html) {
-                fs.writeFile(cacheFilePath, html, 'utf-8', function(err) {
-                    console.log('saved cached page ' + instance.path );
+        if (instance.template) {
+            buildMenu(function () {
+                instance._isCache = true;
+                template = instance.template.toString();
+                cacheFilePath = path.join(cachePath, instance.path + '.html');
+                config.app.render(template, instance, function(err, html) {
+                    fs.writeFile(cacheFilePath, html, 'utf-8', function(err) {
+                        console.log('saved cached page ' + instance.path );
+                    });
                 });
             });
-        });
+        }
     }
 
     function deleteCacheFile(instance, res) {
@@ -225,9 +227,18 @@ module.exports = function (config) {
                 if (err || 0 === page.length) {
                     next();
                 } else {
+                    req.app.locals.page = page[0];
+                    req.app.locals.title = page[0].title;
                     template = page[0].template.toString() || 'page';
-                    console.log('rendering page with "' +  template + '" template');
-                    res.render(template, page[0]);
+
+                    if ('function' === typeof config.beforeRender) {
+                        config.beforeRender(req, res, next, function () {
+                            console.log('rendering page with "' +  template + '" template');
+                            res.render(template);
+                        });
+                    } else {
+                        res.render(template);
+                    }
                 }
             });
         } else {
@@ -237,7 +248,7 @@ module.exports = function (config) {
 
     function buildMenu(callback) {
         if (i < menus.length) {
-            menus[i].find({'isInMenu': true}, null, {sort: ['menuOrder', 'title']},
+            menus[i].find({}, null, {sort: ['menuOrder', 'title']},
                 (function (menu) {
                     return function (err, arr) {
                         var a, item, keyed, nested;
@@ -257,12 +268,12 @@ module.exports = function (config) {
                                     nested.push(item);
                                 }
                             }
-                            config.app.locals[menu.modelName + 'Menu'] = nested;
                         } else {
                             if (err) {
                                 console.log(err);
                             }
                         }
+                        config.app.locals[menu.modelName + 'Menu'] = nested;
                         i += 1;
                         buildMenu(callback);
                     };
@@ -279,7 +290,7 @@ module.exports = function (config) {
         i = 0;
 
         req.app.locals.managers = managers;
-        res.locals.models = models;
+        req.app.locals.models = models;
 
         buildMenu(function () {
             intercept(req, res, next);
