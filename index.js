@@ -43,17 +43,6 @@ module.exports = function (config) {
         }
     }
 
-    if (models.page) {
-        models.page.find({}, function(err, pages) {
-            var i = 0;
-            if (!err) {
-                for (i = 0; i < pages.length; i += 1) {
-                    saveCacheFile(pages[i]);
-                }
-            }
-        })
-    }
-
     function normalize(modelName, data) {
         if ('page' === modelName) {
             data.path = data.path.replace(/[\s_.]/g, '-');
@@ -61,20 +50,23 @@ module.exports = function (config) {
         return data;
     }
 
-    function saveCacheFile(instance) {
+    function saveCacheFile() {
         // Save rendered jade template to filesystem as HTML
-        var cacheFilePath, template;
-
-        i = 0;
-        if (instance.template) {
-            buildMenu(function () {
-                instance._isCache = true;
-                template = instance.template.toString();
-                cacheFilePath = path.join(cachePath, instance.path + '.html');
-                config.app.render(template, instance, function(err, html) {
+        var cacheFilePath = path.join(cachePath, config.app.locals.page.path + '.html');
+        if ('function' === typeof config.beforeRender) {
+            config.beforeRender(function () {
+                console.log('saving cached page with "' +  config.app.locals.page.template + '" template');
+                config.app.render(config.app.locals.page.template, {_isCache: true}, function(err, html) {
                     fs.writeFile(cacheFilePath, html, 'utf-8', function(err) {
-                        console.log('saved cached page ' + instance.path );
+                        console.log('saved cached page ' + config.app.locals.page.path );
                     });
+                });
+            });
+        } else {
+            console.log('saving cached page with "' +  config.app.locals.page.template + '" template');
+            config.app.render(config.app.locals.page.template, {_isCache: true}, function(err, html) {
+                fs.writeFile(cacheFilePath, html, 'utf-8', function(err) {
+                    console.log('saved cached page ' + config.app.locals.page.path );
                 });
             });
         }
@@ -88,12 +80,27 @@ module.exports = function (config) {
         });
     }
 
+    function deleteAllCacheFiles() {
+        var i, cacheFilePath;
+        fs.readdir(cachePath, function (err, files) {
+            for (i = 0; i < files.length; i += 1) {
+                if (files[i].match(/\.html$/)) {
+                    cacheFilePath = path.join(cachePath, files[i]);
+                    fs.unlink(cacheFilePath, function (err) {
+                        console.log('cleared cached page ' + files[i]);
+                    });
+                }
+            }
+        });
+    }
+
     function create(modelName, data, res) {
         console.log('creating model');
         var instance = new models[modelName](normalize(modelName, data));
         instance._modelName = modelName;
         instance.save(function (err, obj) {
-            saveCacheFile(obj, res);
+            deleteAllCacheFiles();
+            saveCacheFile(obj);
             res.send(200, JSON.stringify(obj));
         });
     }
@@ -124,7 +131,7 @@ module.exports = function (config) {
                     if (err) {
                         console.log(err);
                     }
-                    saveCacheFile(obj, res);
+                    saveCacheFile(obj);
                     res.send(200, JSON.stringify(obj));
                 });
             } else {
@@ -137,7 +144,7 @@ module.exports = function (config) {
         console.log('destroying model');
         models[modelName].findById(id, function (err, obj) {
             if (!err && obj) {
-                deleteCacheFile(obj, res);
+                deleteAllCacheFiles();
                 obj.remove();
                 res.send(200, modelName + ' ' + id + ' destroyed');
             } else {
@@ -194,7 +201,7 @@ module.exports = function (config) {
             admin: req.path.match(/^\/admin\/([^/]+)\/?([^/]+)?/),
             delete: req.path.match(/^\/delete\/([^/]+)\/?([^/]+)?/),
             edit: req.path.match(/^\/edit\/([^/]+)\/?([^/]+)?/),
-            page: req.path.match(/^\/([^/]+)\/?$/)
+            page: req.path.match(/^\/([^/.]+)(\/|\.html)?$/)
         };
 
         if (match.admin && models.hasOwnProperty(match.admin[1])) {
@@ -232,11 +239,13 @@ module.exports = function (config) {
                     template = page[0].template.toString() || 'page';
 
                     if ('function' === typeof config.beforeRender) {
-                        config.beforeRender(req, res, next, function () {
+                        config.beforeRender(function () {
                             console.log('rendering page with "' +  template + '" template');
+                            saveCacheFile();
                             res.render(template);
                         });
                     } else {
+                        saveCacheFile();
                         res.render(template);
                     }
                 }
